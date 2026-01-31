@@ -54,7 +54,7 @@ clean:
 	rm -rf client/build client/dist
 	rm -rf dbcLib/build dbcLib/dist
 	rm -rf server/dist server/out
-	rm *.vsix
+	rm -f *.vsix
 	# rm -rf {client,server}/dbcLib
 
 .PHONY: package

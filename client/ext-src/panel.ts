@@ -46,15 +46,13 @@ class DBCPanel implements vscode.CustomTextEditorProvider {
     //     return this.panel;
     // }
 
-	private _getHtmlForWebview() {
+	private _getHtmlForWebview(webview: vscode.Webview) {
 		const manifest = JSON.parse(readFileSync(join(this._extensionPath, 'asset-manifest.json'), {encoding: 'utf8'}));
 		const mainScript:string = manifest['files']['main.js'];
 		const mainStyle:string = manifest['files']['main.css'];
 
-		const scriptPathOnDisk = vscode.Uri.file(join(this._extensionPath, mainScript));
-		const scriptUri = scriptPathOnDisk.with({ scheme: 'vscode-resource' });
-		const stylePathOnDisk = vscode.Uri.file(join(this._extensionPath, mainStyle));
-		const styleUri = stylePathOnDisk.with({ scheme: 'vscode-resource' });
+		const scriptUri = webview.asWebviewUri(vscode.Uri.file(join(this._extensionPath, mainScript)));
+		const styleUri = webview.asWebviewUri(vscode.Uri.file(join(this._extensionPath, mainStyle)));
 
 		// Use a nonce to whitelist which scripts can be run
 		const nonce = getNonce();
@@ -64,10 +62,10 @@ class DBCPanel implements vscode.CustomTextEditorProvider {
 				<meta charset="utf-8">
 				<meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
 				<meta name="theme-color" content="#000000">
-				<title>React App</title>
+				<title>DBC Insight</title>
 				<link rel="stylesheet" type="text/css" href="${styleUri}">
-				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src vscode-resource: https:; script-src 'nonce-${nonce}';style-src vscode-resource: 'unsafe-inline' http: https: data:;">
-				<base href="${vscode.Uri.file(this._extensionPath).with({ scheme: 'vscode-resource' })}/">
+				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${webview.cspSource} https:; script-src 'nonce-${nonce}' 'unsafe-eval'; style-src ${webview.cspSource} 'unsafe-inline';">
+				<base href="${webview.asWebviewUri(vscode.Uri.file(this._extensionPath))}/">
 			</head>
 			<body>
 				<noscript>You need to enable JavaScript to run this app.</noscript>
@@ -79,11 +77,9 @@ class DBCPanel implements vscode.CustomTextEditorProvider {
 	}
 
     public parsedDBC(received: string){
-        //console.log("received dbc");
         if(this.panel == null)
             return;
         this.panel.webview.postMessage(received);
-        // this.panel.webview.html = this._getHtmlForWebview();
     }
 
     public async resolveCustomTextEditor(
@@ -97,12 +93,13 @@ class DBCPanel implements vscode.CustomTextEditorProvider {
         webviewPanel.webview.options = {
             enableScripts: true,
 			localResourceRoots: [
-				vscode.Uri.file(this._extensionPath)
+				vscode.Uri.file(this._extensionPath),
+                vscode.Uri.file(join(this.context.extensionPath, 'client', 'build'))
 			]
         };
         
         this.panel = webviewPanel;
-        webviewPanel.webview.html = this._getHtmlForWebview();
+        webviewPanel.webview.html = this._getHtmlForWebview(webviewPanel.webview);
 
         this.registerCallbacks(document, webviewPanel);      
     }

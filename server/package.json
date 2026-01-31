@@ -1,16 +1,16 @@
 {
     "name": "dbc-server",
     "description": "DBC language server",
-    "author": "Landon Harris",
+    "author": "n0rbury",
     "version": "0.0.1",
     "license": "GPL-2.0-only",
-    "publisher": "lharri73",
+    "publisher": "n0rbury",
     "engines": {
         "node": "*"
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/lharri73/DBC-Language-Syntax"
+        "url": "https://github.com/n0rbury/DBC-Insight"
     },
     "dependencies": {
         "dbclib": "file:../dbcLib",
@@ -25,8 +25,8 @@
     },
     "devDependencies": {
         "jison-gho-loader": "^1.0.2",
-        "ts-loader": "^8.1.0",
-        "webpack": "^5.31.2",
-        "webpack-cli": "^4.7.0"
+        "ts-loader": "^8.4.0",
+        "webpack": "^5.104.1",
+        "webpack-cli": "^4.10.0"
     }
 }

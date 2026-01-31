@@ -167,7 +167,7 @@ val_table_descriptions
     :  {$$ = new Map();}
     | val_table_descriptions val_table_descr{
         $$ = $val_table_descriptions;
-        $$[$val_table_descr[0]] = $val_table_descr[1];
+        $$.set($val_table_descr[0], $val_table_descr[1]);
     };
 
 val_table_descr

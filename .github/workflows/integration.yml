@@ -1,4 +1,4 @@
-name: DBC language CI
+name: DBC Insight CI
 
 on:
   push:
@@ -11,21 +11,16 @@ on:
 jobs:
   compile:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version:
-          - 13.x
-          - 14.x
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{matrix.node-version}}
-        uses: actions/setup-node@v1
+      - uses: actions/checkout@v4
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
         with:
-          node-version: ${{matrix.node-version}}
+          node-version: 20.x
+          cache: 'npm'
 
-      - run: npm install --also=dev
-        name: Install Dependencies
+      - name: Install Dependencies
+        run: npm install
       
-      - run: make
-        name: Compile and Build
- 
+      - name: Compile and Build
+        run: make

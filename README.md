@@ -1,65 +1,58 @@
-# DBC Language Syntax
+# DBC Insight
 
-![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/lharri73.dbc?style=flat-square)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/lharri73/DBC-Language-Syntax/DBC%20language%20CI?style=flat-square)
+![DBC Insight Logo](res/logo.svg)
 
-This extension provides basic syntax highlighting, bracket completion, code
-snippets, lexer/parser errors, and a preview window for the Vector DBC file format. 
-This is created to work with version 2 of the [Vector DBC file format](https://bitbucket.org/tobylorenz/vector_dbc/src/master/).
+[![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/n0rbury.dbc-insight?style=flat-square)](https://marketplace.visualstudio.com/items?itemName=n0rbury.dbc-insight)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/n0rbury/DBC-Insight/DBC%20Insight%20CI?style=flat-square)
 
-Although DBC files are often programmatically generated, it can be useful to
-more easily read the DBC file itself in a plaintext format. 
-Syntax highlighting is handled locally through VSCode's 
-integrated TextMates language parsing engine, using PCRE regular 
-expressions to match syntax. 
+VS Code extension providing diagnostics and a powerful graphical preview for CAN DBC files. Forked and rebooted from the original DBC Language Syntax extension.
 
-This extension also provides a sidebar to preview messages in the current, open
-DBC file. While this doesn't allow editing, it takes information from various
-parts of the DBC and makes it easily readable and searchable. 
+## 🌟 Key Features
 
-*The preview window is still a work in progress!*
+### 🌳 Professional Sidebar Navigation
+Explore your CAN network with a foldable tree structure. Messages are automatically grouped by transmitter (TX) and receiver (RX) for every node.
 
-## Syntax Highlighting
-<img src="res/syntax.png" width="500">
+### 🔍 Smart "Jump to" Search
+Find any node, message, or signal instantly. Search by Name, Decimal ID, or Hex ID. Clicking a result instantly navigates to its details and auto-expands the tree.
 
-## Message and Signal Preview
-<img src="res/sidebar.gif" width="800">
+### 📊 Interactive Bit Matrix
+Visualize exactly how signals are packed into messages. Supports both **Intel (Little Endian)** and **Motorola (Big Endian)** layouts with interactive start-bit highlighting.
 
-## Lexicographic and Parser Errors
-<img src="res/errors.gif" width="800">
+### 📋 Full Metadata Support
+Detailed property grids for all objects, including **Value Tables** (enums), units, factors, offsets, and comments.
 
-## Commonly Used Snippets
-<img src="res/snippets.gif" width="800">
+## 🚀 Usage
+1. Open a `.dbc` file in VS Code.
+2. Click the **DBC Insight** icon in the editor title bar (top right).
+3. Browse the tree or use the search bar to inspect your database.
 
-## Known Issues
-1. Attribute definitions that wrap lines may not be highlighted on the following
-   lines. 
-1. Signals that are multiplexed will not be recognized
+---
 
-## Todo items
-- Include debugging (invalid offset, start bit, min, max, etc)
-- Show more information about each signal (val tables, comments, etc.)
-- Show the byte structure of the message
+## 📸 Media & Demos
 
-## Organization
-- `server`
-  - Contains the language server and parser for the dbc language sytax
-- `client`
-  - Contains the editor and viewer
-- `dbcLib`
-  - basic type descriptions of each element/class of the dbc language
+### Syntax Highlighting & Validation
+![Syntax](res/syntax.png)
+*Provides professional syntax highlighting and real-time parser/lexer diagnostics.*
 
-## 3rd Party Libraries
-- [Vector DBC file format](https://bitbucket.org/tobylorenz/vector_dbc/src/master/).
-  - Although no code from this repository is used in this extension, this served
-    as a reference for the DBC format and syntax. 
-- [jison](https://github.com/zaach/jison)
-  - The parser and lexer used on the server side to parse dbc files
-- [React.js](https://reactjs.org/)
-  - Used to display the parsed message/signal data in the vscode browser panel. 
-- [MessagePack](https://msgpack.org/)
-  - Serializes the parsed DBC file's intermediate representation into a packed
-    binary before sending to the browser panel.
+### Interactive Preview
+![Sidebar](res/sidebar.gif)
+*The new sidebar with foldable tree and jump-to search.*
 
-## License
-GNU General Public License v2.0 only
+### Code Snippets
+![Snippets](res/snippets.gif)
+*Built-in snippets for common DBC objects (Messages, Signals, Nodes).*
+
+---
+
+## 🛠 Project Organization
+- **`dbcLib`**: Core library containing the data models and binary serialization logic.
+- **`server`**: Language Server Protocol (LSP) implementation using Jison for parsing.
+- **`client`**: VS Code extension host and the React-based preview panel.
+
+## 🤝 Third Party Libraries
+- [jison](https://github.com/zaach/jison) - Parser generator.
+- [React.js](https://reactjs.org/) - Frontend UI.
+- [MessagePack](https://msgpack.org/) - Efficient binary serialization.
+
+## ⚖ License
+GNU General Public License v2.0 only.

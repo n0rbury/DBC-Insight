@@ -1,388 +1,8 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 271:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-/**
- * Copyright (C) 2021 Landon Harris
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; version 2.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see
- * <https://www.gnu.org/licenses/old-licenses/gpl-2.0-standalone.html>.
-*/
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.AttributeDef = exports.Attribute = void 0;
-class Attribute {
-    constructor(name, objectType, value) {
-        this.name = name;
-        this.type = objectType;
-        this.value = value;
-        this.clsType = "attribute";
-    }
-}
-exports.Attribute = Attribute;
-class AttributeDef {
-    constructor(name, objType, valType) {
-        this.name = name;
-        this.objType = objType;
-        this.valType = valType;
-        this.clsType = "attributeDef";
-    }
-}
-exports.AttributeDef = AttributeDef;
-
-
-/***/ }),
-
-/***/ 761:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-/**
- * Copyright (C) 2021 Landon Harris
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; version 2.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see
- * <https://www.gnu.org/licenses/old-licenses/gpl-2.0-standalone.html>.
-*/
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Database = void 0;
-;
-class Database {
-    constructor() {
-        this.messages = new Map();
-        this.valTables = new Map();
-        this.version = "";
-        this.symbols = [];
-        this.parseErrors = [];
-        this.bitTiming = {
-            baudRate: -1,
-            register_1: -1,
-            register_2: -1
-        };
-        this.nodes = new Map();
-        this.environmentVariables = new Map();
-        this.signalTypes = new Map();
-        this.comment = "";
-        this.attrDefs = new Map();
-        this.attributes = new Map();
-        this.fileName = "";
-        this.type = "database";
-    }
-}
-exports.Database = Database;
-Database.identifier = "Database";
-
-
-/***/ }),
-
-/***/ 7:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-/**
- * Copyright (C) 2021 Landon Harris
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; version 2.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see
- * <https://www.gnu.org/licenses/old-licenses/gpl-2.0-standalone.html>.
-*/
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Node = void 0;
-class Node {
-    constructor(name) {
-        this.name = name;
-        this.comment = "";
-        this.attributes = new Map();
-        this.clsType = "node";
-    }
-}
-exports.Node = Node;
-
-
-/***/ }),
-
-/***/ 237:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-/**
- * Copyright (C) 2021 Landon Harris
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; version 2.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see
- * <https://www.gnu.org/licenses/old-licenses/gpl-2.0-standalone.html>.
-*/
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.DBCError = void 0;
-var conditionType;
-(function (conditionType) {
-    conditionType[conditionType["noCondition"] = 0] = "noCondition";
-    conditionType[conditionType["mapHas"] = 1] = "mapHas";
-})(conditionType || (conditionType = {}));
-class DBCError {
-    constructor(whence, what, type, // 0: warning, 1: error
-    token = "") {
-        this.whence = whence;
-        this.what = what;
-        this.type = type;
-        this.token = token;
-        this.hasCondition = false;
-        this.condition = conditionType.noCondition;
-        this.mapVal = null;
-        this.key = null;
-    }
-    evalCondition() {
-        // returns false if error needs to be added
-        if (!this.hasCondition)
-            return false;
-        switch (this.condition) {
-            case conditionType.noCondition:
-                return false;
-            case conditionType.mapHas:
-                return this.evalMapCondition();
-            default:
-                break;
-        }
-    }
-    addMapCondition(mapVal, key) {
-        this.mapVal = mapVal;
-        this.key = key;
-        this.condition = conditionType.mapHas;
-        this.hasCondition = true;
-    }
-    evalMapCondition() {
-        if (this.mapVal === null || this.key === null)
-            // no condition set. unconditional error, so always add
-            return false;
-        else if (this.mapVal === undefined)
-            // map doest exist so there's no way the key is in it. 
-            return false;
-        else {
-            // console.log("checking map condition", this.mapVal, this.key, this.mapVal.has(this.key));
-            if (this.mapVal.has(this.key))
-                return true;
-            else
-                return false;
-        }
-    }
-    isMapCondition() {
-        return this.condition == conditionType.mapHas;
-    }
-}
-exports.DBCError = DBCError;
-
-
-/***/ }),
-
-/***/ 276:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-/**
- * Copyright (C) 2021 Landon Harris
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; version 2.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see
- * <https://www.gnu.org/licenses/old-licenses/gpl-2.0-standalone.html>.
-*/
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.EnvironmentVariable = void 0;
-class EnvironmentVariable {
-    constructor() {
-        this.name = "";
-        this.type = 2;
-        this.min = -1;
-        this.max = 0;
-        this.unit = "";
-        this.initialVal = 0;
-        this.id = 0;
-        this.transmitters = [];
-        this.valueDescriptions = new Map();
-        this.dataSize = 0; // used when ENVVAR_DATA is present
-        this.comment = "";
-        this.attributes = new Map();
-        this.clsType = "environmentVariable";
-    }
-}
-exports.EnvironmentVariable = EnvironmentVariable;
-
-
-/***/ }),
-
-/***/ 780:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-/**
- * Copyright (C) 2021 Landon Harris
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; version 2.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see
- * <https://www.gnu.org/licenses/old-licenses/gpl-2.0-standalone.html>.
-*/
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Message = void 0;
-class Message {
-    constructor(endLineNum, Id, Name, Size, Transmitter, Signals) {
-        this.id = Id;
-        this.name = Name;
-        this.size = Size;
-        this.transmitter = Transmitter;
-        this.signals = Signals;
-        this.comment = "";
-        this.transmitters = [];
-        this.signalGroups = new Map();
-        this.attributes = new Map();
-        this.endNum = endLineNum;
-        this.clsType = "message";
-    }
-    get lineNum() {
-        return this.endNum - this.signals.size;
-    }
-    represent() {
-        var hex = this.id.toString(16).padStart(3, "000").toUpperCase();
-        var dec = this.id.toString(10).padStart(4, "0000");
-        return `0x${hex} (${dec}) ${this.name}`;
-    }
-}
-exports.Message = Message;
-
-
-/***/ }),
-
-/***/ 730:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-/**
- * Copyright (C) 2021 Landon Harris
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; version 2.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see
- * <https://www.gnu.org/licenses/old-licenses/gpl-2.0-standalone.html>.
-*/
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.SignalGroup = exports.SignalType = exports.Signal = void 0;
-class Signal {
-    constructor(lineNo, Name, Start, Size, Order, Type, Factor, Offset, Min, Max, Unit, Receivers) {
-        this.name = Name;
-        this.startBit = Start;
-        this.bitSize = Size;
-        this.byteOrder = Order;
-        this.valueType = Type;
-        this.factor = Factor;
-        this.offset = Offset;
-        this.minimum = Min;
-        this.maximum = Max;
-        this.unit = Unit;
-        this.receivers = Receivers;
-        this.valTable = null;
-        this.comment = "";
-        this.attributes = new Map();
-        this.lineNum = lineNo;
-        this.clsType = "signal";
-    }
-}
-exports.Signal = Signal;
-class SignalType {
-    constructor(name, size, byteOrder, valueType, factor, offset, min, max, unit, defaultVal, valTable) {
-        this.name = name;
-        this.size = size;
-        this.byteOrder = byteOrder;
-        this.valueType = valueType;
-        this.factor = factor;
-        this.offset = offset;
-        this.minimum = min;
-        this.maximum = max;
-        this.unit = unit;
-        this.default = defaultVal;
-        this.valTable = valTable;
-        this.clsType = "signalType";
-    }
-}
-exports.SignalType = SignalType;
-class SignalGroup {
-    constructor() {
-        this.messageId = 0;
-        this.name = "";
-        this.repetitions = 0;
-        this.signals = [];
-        this.clsType = "signalGroup";
-    }
-}
-exports.SignalGroup = SignalGroup;
-
-
-/***/ }),
-
-/***/ 112:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ 105
+(__unused_webpack_module, exports) {
 
 "use strict";
 
@@ -422,466 +42,10 @@ class ValueType {
 exports.ValueType = ValueType;
 
 
-/***/ }),
+/***/ },
 
-/***/ 164:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-"use strict";
-
-/**
- * Copyright (C) 2022 Landon Harris
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; version 2.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see
- * <https://www.gnu.org/licenses/old-licenses/gpl-2.0-standalone.html>.
-*/
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.decodeDb = exports.encodeDb = exports.extensionCodec = void 0;
-const msgpack_1 = __webpack_require__(676);
-const db_1 = __webpack_require__(761);
-const message_1 = __webpack_require__(780);
-const dbcNode_1 = __webpack_require__(7);
-const valtable_1 = __webpack_require__(112);
-const attributes_1 = __webpack_require__(271);
-const ev_1 = __webpack_require__(276);
-const signal_1 = __webpack_require__(730);
-const b64 = __webpack_require__(575);
-// DBCError elided
-exports.extensionCodec = new msgpack_1.ExtensionCodec();
-// Attribute
-exports.extensionCodec.register({
-    type: 2,
-    encode: (input) => {
-        if ((input === null || input === void 0 ? void 0 : input.clsType) == "attribute") {
-            let object = input;
-            var name = msgpack_1.encode(object.name, { extensionCodec: exports.extensionCodec });
-            var type = msgpack_1.encode(object.type, { extensionCodec: exports.extensionCodec });
-            var value = msgpack_1.encode(object.value, { extensionCodec: exports.extensionCodec });
-            return msgpack_1.encode([name, type, value], { extensionCodec: exports.extensionCodec });
-        }
-        else {
-            return null;
-        }
-    },
-    decode: (data) => {
-        const array = msgpack_1.decode(data, { extensionCodec: exports.extensionCodec });
-        return new attributes_1.Attribute(msgpack_1.decode(array[0], { extensionCodec: exports.extensionCodec }), msgpack_1.decode(array[1], { extensionCodec: exports.extensionCodec }), msgpack_1.decode(array[2], { extensionCodec: exports.extensionCodec }));
-    }
-});
-// AttributeDef
-exports.extensionCodec.register({
-    type: 3,
-    encode: (input) => {
-        if ((input === null || input === void 0 ? void 0 : input.clsType) == "attributeDef") {
-            let object = input;
-            var name = msgpack_1.encode(object.name, { extensionCodec: exports.extensionCodec });
-            var type = msgpack_1.encode(object.objType, { extensionCodec: exports.extensionCodec });
-            var value = msgpack_1.encode(object.valType, { extensionCodec: exports.extensionCodec });
-            return msgpack_1.encode([name, type, value], { extensionCodec: exports.extensionCodec });
-        }
-        else
-            return null;
-    },
-    decode: (data) => {
-        const array = msgpack_1.decode(data, { extensionCodec: exports.extensionCodec });
-        return new attributes_1.AttributeDef(msgpack_1.decode(array[0], { extensionCodec: exports.extensionCodec }), msgpack_1.decode(array[1], { extensionCodec: exports.extensionCodec }), msgpack_1.decode(array[2], { extensionCodec: exports.extensionCodec }));
-    }
-});
-// Node
-exports.extensionCodec.register({
-    type: 4,
-    encode: (input) => {
-        if ((input === null || input === void 0 ? void 0 : input.clsType) == "node") {
-            let object = input;
-            var name = msgpack_1.encode(object.name, { extensionCodec: exports.extensionCodec });
-            var comment = msgpack_1.encode(object.comment, { extensionCodec: exports.extensionCodec });
-            var attributes = msgpack_1.encode(object.attributes, { extensionCodec: exports.extensionCodec });
-            return msgpack_1.encode([name, comment, attributes], { extensionCodec: exports.extensionCodec });
-        }
-        else
-            return null;
-    },
-    decode: (data) => {
-        const array = msgpack_1.decode(data, { extensionCodec: exports.extensionCodec });
-        var ret = new dbcNode_1.Node(msgpack_1.decode(array[0], { extensionCodec: exports.extensionCodec }));
-        ret.comment = msgpack_1.decode(array[1], { extensionCodec: exports.extensionCodec });
-        ret.attributes = msgpack_1.decode(array[2], { extensionCodec: exports.extensionCodec });
-        return ret;
-    }
-});
-// Environment Variable
-exports.extensionCodec.register({
-    type: 5,
-    encode: (input) => {
-        if ((input === null || input === void 0 ? void 0 : input.clsType) == "environmentVariable") {
-            let object = input;
-            var name = msgpack_1.encode(object.name, { extensionCodec: exports.extensionCodec });
-            var type = msgpack_1.encode(object.type, { extensionCodec: exports.extensionCodec });
-            var min = msgpack_1.encode(object.min, { extensionCodec: exports.extensionCodec });
-            var max = msgpack_1.encode(object.max, { extensionCodec: exports.extensionCodec });
-            var unit = msgpack_1.encode(object.unit, { extensionCodec: exports.extensionCodec });
-            var initialVal = msgpack_1.encode(object.initialVal, { extensionCodec: exports.extensionCodec });
-            var id = msgpack_1.encode(object.id, { extensionCodec: exports.extensionCodec });
-            var transmitters = msgpack_1.encode(object.transmitters, { extensionCodec: exports.extensionCodec });
-            var valueDescriptions = msgpack_1.encode(object.valueDescriptions, { extensionCodec: exports.extensionCodec });
-            var dataSize = msgpack_1.encode(object.dataSize, { extensionCodec: exports.extensionCodec });
-            var comment = msgpack_1.encode(object.comment, { extensionCodec: exports.extensionCodec });
-            var attributes = msgpack_1.encode(object.attributes, { extensionCodec: exports.extensionCodec });
-            return (msgpack_1.encode([name, type, min, max, unit, initialVal, id, transmitters, valueDescriptions, dataSize, comment, attributes]));
-        }
-        else
-            return null;
-    },
-    decode: (data) => {
-        const array = msgpack_1.decode(data, { extensionCodec: exports.extensionCodec });
-        var ret = new ev_1.EnvironmentVariable();
-        ret.name = msgpack_1.decode(array[0], { extensionCodec: exports.extensionCodec });
-        ret.type = msgpack_1.decode(array[1], { extensionCodec: exports.extensionCodec });
-        ret.min = msgpack_1.decode(array[2], { extensionCodec: exports.extensionCodec });
-        ret.max = msgpack_1.decode(array[3], { extensionCodec: exports.extensionCodec });
-        ret.unit = msgpack_1.decode(array[4], { extensionCodec: exports.extensionCodec });
-        ret.initialVal = msgpack_1.decode(array[5], { extensionCodec: exports.extensionCodec });
-        ret.id = msgpack_1.decode(array[6], { extensionCodec: exports.extensionCodec });
-        ret.transmitters = msgpack_1.decode(array[7], { extensionCodec: exports.extensionCodec });
-        ret.dataSize = msgpack_1.decode(array[8], { extensionCodec: exports.extensionCodec });
-        ret.comment = msgpack_1.decode(array[9], { extensionCodec: exports.extensionCodec });
-        ret.attributes = msgpack_1.decode(array[10], { extensionCodec: exports.extensionCodec });
-        return ret;
-    }
-});
-// message
-exports.extensionCodec.register({
-    type: 6,
-    encode: (input) => {
-        if ((input === null || input === void 0 ? void 0 : input.clsType) == "message") {
-            let object = input;
-            const id = msgpack_1.encode(object.id, { extensionCodec: exports.extensionCodec });
-            const name = msgpack_1.encode(object.name, { extensionCodec: exports.extensionCodec });
-            const size = msgpack_1.encode(object.size, { extensionCodec: exports.extensionCodec });
-            const transmitter = msgpack_1.encode(object.transmitter, { extensionCodec: exports.extensionCodec });
-            const transmitters = msgpack_1.encode(object.transmitters, { extensionCodec: exports.extensionCodec });
-            const signals = msgpack_1.encode(object.signals, { extensionCodec: exports.extensionCodec });
-            const comment = msgpack_1.encode(object.comment, { extensionCodec: exports.extensionCodec });
-            const signalGroups = msgpack_1.encode(object.signalGroups, { extensionCodec: exports.extensionCodec });
-            const attributes = msgpack_1.encode(object.attributes, { extensionCodec: exports.extensionCodec });
-            return msgpack_1.encode([id, name, size, transmitter, transmitters, signals, comment, signalGroups, attributes], { extensionCodec: exports.extensionCodec });
-        }
-        else
-            return null;
-    },
-    decode: (data) => {
-        const array = msgpack_1.decode(data, { extensionCodec: exports.extensionCodec });
-        var ret = new message_1.Message(0, // endLineNum
-        msgpack_1.decode(array[0], { extensionCodec: exports.extensionCodec }), // id
-        msgpack_1.decode(array[1], { extensionCodec: exports.extensionCodec }), // name
-        msgpack_1.decode(array[2], { extensionCodec: exports.extensionCodec }), // size
-        msgpack_1.decode(array[3], { extensionCodec: exports.extensionCodec }), // transmitter
-        msgpack_1.decode(array[5], { extensionCodec: exports.extensionCodec }) // signals
-        );
-        ret.transmitters = msgpack_1.decode(array[4], { extensionCodec: exports.extensionCodec });
-        ret.comment = msgpack_1.decode(array[6], { extensionCodec: exports.extensionCodec });
-        ret.signalGroups = msgpack_1.decode(array[7], { extensionCodec: exports.extensionCodec });
-        ret.attributes = msgpack_1.decode(array[8], { extensionCodec: exports.extensionCodec });
-        return ret;
-    }
-});
-// signal
-exports.extensionCodec.register({
-    type: 7,
-    encode: (input) => {
-        if ((input === null || input === void 0 ? void 0 : input.clsType) == "signal") {
-            let object = input;
-            const name = msgpack_1.encode(object.name, { extensionCodec: exports.extensionCodec });
-            const startBit = msgpack_1.encode(object.startBit, { extensionCodec: exports.extensionCodec });
-            const bitSize = msgpack_1.encode(object.bitSize, { extensionCodec: exports.extensionCodec });
-            const byteOrder = msgpack_1.encode(object.byteOrder, { extensionCodec: exports.extensionCodec });
-            const valueType = msgpack_1.encode(object.valueType, { extensionCodec: exports.extensionCodec });
-            const factor = msgpack_1.encode(object.factor, { extensionCodec: exports.extensionCodec });
-            const offset = msgpack_1.encode(object.offset, { extensionCodec: exports.extensionCodec });
-            const minimum = msgpack_1.encode(object.minimum, { extensionCodec: exports.extensionCodec });
-            const maximum = msgpack_1.encode(object.maximum, { extensionCodec: exports.extensionCodec });
-            const unit = msgpack_1.encode(object.unit, { extensionCodec: exports.extensionCodec });
-            const receivers = msgpack_1.encode(object.receivers, { extensionCodec: exports.extensionCodec });
-            const valTable = msgpack_1.encode(object.valTable, { extensionCodec: exports.extensionCodec });
-            const comment = msgpack_1.encode(object.comment, { extensionCodec: exports.extensionCodec });
-            const attributes = msgpack_1.encode(object.attributes, { extensionCodec: exports.extensionCodec });
-            const lineNum = msgpack_1.encode(object.lineNum, { extensionCodec: exports.extensionCodec });
-            return msgpack_1.encode([
-                name,
-                startBit,
-                bitSize,
-                byteOrder,
-                valueType,
-                factor,
-                offset,
-                minimum,
-                maximum,
-                unit,
-                receivers,
-                valTable,
-                comment,
-                attributes,
-                lineNum
-            ]);
-        }
-        else
-            return null;
-    },
-    decode: (data) => {
-        const array = msgpack_1.decode(data, { extensionCodec: exports.extensionCodec });
-        var ret = new signal_1.Signal(msgpack_1.decode(array[14], { extensionCodec: exports.extensionCodec }), // lineNum
-        msgpack_1.decode(array[0], { extensionCodec: exports.extensionCodec }), // name
-        msgpack_1.decode(array[1], { extensionCodec: exports.extensionCodec }), // start
-        msgpack_1.decode(array[2], { extensionCodec: exports.extensionCodec }), // size
-        msgpack_1.decode(array[3], { extensionCodec: exports.extensionCodec }), // byte order
-        msgpack_1.decode(array[4], { extensionCodec: exports.extensionCodec }), // valtype
-        msgpack_1.decode(array[5], { extensionCodec: exports.extensionCodec }), // factor
-        msgpack_1.decode(array[6], { extensionCodec: exports.extensionCodec }), // offset
-        msgpack_1.decode(array[7], { extensionCodec: exports.extensionCodec }), // min
-        msgpack_1.decode(array[8], { extensionCodec: exports.extensionCodec }), // max
-        msgpack_1.decode(array[9], { extensionCodec: exports.extensionCodec }), // unit
-        msgpack_1.decode(array[10], { extensionCodec: exports.extensionCodec }) // receivers
-        );
-        ret.valTable = msgpack_1.decode(array[11], { extensionCodec: exports.extensionCodec });
-        ret.comment = msgpack_1.decode(array[12], { extensionCodec: exports.extensionCodec });
-        ret.attributes = msgpack_1.decode(array[13], { extensionCodec: exports.extensionCodec });
-        return ret;
-    }
-});
-// signalType
-exports.extensionCodec.register({
-    type: 8,
-    encode: (input) => {
-        if ((input === null || input === void 0 ? void 0 : input.clsType) == "signalType") {
-            let object = input;
-            const name = msgpack_1.encode(object.name, { extensionCodec: exports.extensionCodec });
-            const size = msgpack_1.encode(object.size, { extensionCodec: exports.extensionCodec });
-            const byteOrder = msgpack_1.encode(object.byteOrder, { extensionCodec: exports.extensionCodec });
-            const valueType = msgpack_1.encode(object.valueType, { extensionCodec: exports.extensionCodec });
-            const factor = msgpack_1.encode(object.factor, { extensionCodec: exports.extensionCodec });
-            const offset = msgpack_1.encode(object.offset, { extensionCodec: exports.extensionCodec });
-            const minimum = msgpack_1.encode(object.minimum, { extensionCodec: exports.extensionCodec });
-            const maximum = msgpack_1.encode(object.maximum, { extensionCodec: exports.extensionCodec });
-            const unit = msgpack_1.encode(object.unit, { extensionCodec: exports.extensionCodec });
-            const defaultVal = msgpack_1.encode(object.default, { extensionCodec: exports.extensionCodec });
-            const valTable = msgpack_1.encode(object.valTable, { extensionCodec: exports.extensionCodec });
-            return msgpack_1.encode([
-                name,
-                size,
-                byteOrder,
-                valueType,
-                factor,
-                offset,
-                minimum,
-                maximum,
-                unit,
-                defaultVal,
-                valTable
-            ]);
-        }
-        else
-            return null;
-    },
-    decode: (data) => {
-        const array = msgpack_1.decode(data, { extensionCodec: exports.extensionCodec });
-        var ret = new signal_1.SignalType(msgpack_1.decode(array[0], { extensionCodec: exports.extensionCodec }), // name
-        msgpack_1.decode(array[1], { extensionCodec: exports.extensionCodec }), // size
-        msgpack_1.decode(array[2], { extensionCodec: exports.extensionCodec }), // byte order
-        msgpack_1.decode(array[3], { extensionCodec: exports.extensionCodec }), // valtype
-        msgpack_1.decode(array[4], { extensionCodec: exports.extensionCodec }), // factor
-        msgpack_1.decode(array[5], { extensionCodec: exports.extensionCodec }), // offset
-        msgpack_1.decode(array[6], { extensionCodec: exports.extensionCodec }), // min
-        msgpack_1.decode(array[7], { extensionCodec: exports.extensionCodec }), // max
-        msgpack_1.decode(array[8], { extensionCodec: exports.extensionCodec }), // unit
-        msgpack_1.decode(array[9], { extensionCodec: exports.extensionCodec }), // defaultVal
-        msgpack_1.decode(array[10], { extensionCodec: exports.extensionCodec }) // valTable
-        );
-        return ret;
-    }
-});
-// SignalGroup
-exports.extensionCodec.register({
-    type: 9,
-    encode: (input) => {
-        if ((input === null || input === void 0 ? void 0 : input.clsType) == "signalGroup") {
-            let object = input;
-            return msgpack_1.encode([
-                msgpack_1.encode(object.messageId, { extensionCodec: exports.extensionCodec }),
-                msgpack_1.encode(object.name, { extensionCodec: exports.extensionCodec }),
-                msgpack_1.encode(object.repetitions, { extensionCodec: exports.extensionCodec }),
-                msgpack_1.encode(object.signals, { extensionCodec: exports.extensionCodec })
-            ]);
-        }
-        else
-            return null;
-    },
-    decode: (data) => {
-        const array = msgpack_1.decode(data, { extensionCodec: exports.extensionCodec });
-        var ret = new signal_1.SignalGroup();
-        ret.messageId = msgpack_1.decode(array[0], { extensionCodec: exports.extensionCodec });
-        ret.name = msgpack_1.decode(array[1], { extensionCodec: exports.extensionCodec });
-        ret.repetitions = msgpack_1.decode(array[2], { extensionCodec: exports.extensionCodec });
-        ret.signals = msgpack_1.decode(array[3], { extensionCodec: exports.extensionCodec });
-        return ret;
-    }
-});
-// ValTable
-exports.extensionCodec.register({
-    type: 10,
-    encode: (input) => {
-        if ((input === null || input === void 0 ? void 0 : input.clsType) == "valTable") {
-            let object = input;
-            return msgpack_1.encode([
-                msgpack_1.encode(object.name, { extensionCodec: exports.extensionCodec }),
-                msgpack_1.encode(object.descriptions, { extensionCodec: exports.extensionCodec })
-            ]);
-        }
-        else
-            return null;
-    },
-    decode: (data) => {
-        const array = msgpack_1.decode(data, { extensionCodec: exports.extensionCodec });
-        var ret = new valtable_1.ValTable(msgpack_1.decode(array[0], { extensionCodec: exports.extensionCodec }));
-        ret.descriptions = msgpack_1.decode(array[1], { extensionCodec: exports.extensionCodec });
-        return ret;
-    }
-});
-// ValueType
-exports.extensionCodec.register({
-    type: 11,
-    encode: (input) => {
-        if ((input === null || input === void 0 ? void 0 : input.clsType) == "valueType") {
-            let object = input;
-            return msgpack_1.encode([
-                msgpack_1.encode(object.type, { extensionCodec: exports.extensionCodec }),
-                msgpack_1.encode(object.min, { extensionCodec: exports.extensionCodec }),
-                msgpack_1.encode(object.max, { extensionCodec: exports.extensionCodec }),
-                msgpack_1.encode(object.enumVals, { extensionCodec: exports.extensionCodec })
-            ]);
-        }
-        else
-            return null;
-    },
-    decode: (data) => {
-        const array = msgpack_1.decode(data, { extensionCodec: exports.extensionCodec });
-        var ret = new valtable_1.ValueType(msgpack_1.decode(array[0], { extensionCodec: exports.extensionCodec }));
-        ret.min = msgpack_1.decode(array[1], { extensionCodec: exports.extensionCodec });
-        ret.max = msgpack_1.decode(array[2], { extensionCodec: exports.extensionCodec });
-        ret.enumVals = msgpack_1.decode(array[3], { extensionCodec: exports.extensionCodec });
-        return ret;
-    }
-});
-// Database
-exports.extensionCodec.register({
-    type: 1,
-    encode: (input) => {
-        if ((input === null || input === void 0 ? void 0 : input.type) == "database") {
-            let object = input;
-            var msgs = msgpack_1.encode(object.messages, { extensionCodec: exports.extensionCodec });
-            var valTables = msgpack_1.encode(object.valTables, { extensionCodec: exports.extensionCodec });
-            var nodes = msgpack_1.encode(object.nodes, { extensionCodec: exports.extensionCodec });
-            var environmentVariables = msgpack_1.encode(object.environmentVariables, { extensionCodec: exports.extensionCodec });
-            var signalTypes = msgpack_1.encode(object.signalTypes, { extensionCodec: exports.extensionCodec });
-            var attrDefs = msgpack_1.encode(object.attrDefs, { extensionCodec: exports.extensionCodec });
-            var attrs = msgpack_1.encode(object.attributes, { extensionCodec: exports.extensionCodec });
-            var version = msgpack_1.encode(object.version, { extensionCodec: exports.extensionCodec });
-            var comment = msgpack_1.encode(object.comment, { extensionCodec: exports.extensionCodec });
-            var filename = msgpack_1.encode(object.fileName, { extensionCodec: exports.extensionCodec });
-            return msgpack_1.encode([version, filename, comment, msgs, valTables, nodes, environmentVariables, signalTypes, attrDefs, attrs], { extensionCodec: exports.extensionCodec });
-        }
-        else {
-            return null;
-        }
-    },
-    decode: (data) => {
-        const array = msgpack_1.decode(data, { extensionCodec: exports.extensionCodec });
-        var ret = new db_1.Database();
-        ret.version = msgpack_1.decode(array[0], { extensionCodec: exports.extensionCodec });
-        ret.fileName = msgpack_1.decode(array[1], { extensionCodec: exports.extensionCodec });
-        ret.comment = msgpack_1.decode(array[2], { extensionCodec: exports.extensionCodec });
-        ret.messages = msgpack_1.decode(array[3], { extensionCodec: exports.extensionCodec });
-        ret.valTables = msgpack_1.decode(array[4], { extensionCodec: exports.extensionCodec });
-        ret.nodes = msgpack_1.decode(array[5], { extensionCodec: exports.extensionCodec });
-        ret.environmentVariables = msgpack_1.decode(array[6], { extensionCodec: exports.extensionCodec });
-        ret.signalTypes = msgpack_1.decode(array[7], { extensionCodec: exports.extensionCodec });
-        ret.attrDefs = msgpack_1.decode(array[8], { extensionCodec: exports.extensionCodec });
-        ret.attributes = msgpack_1.decode(array[9], { extensionCodec: exports.extensionCodec });
-        return ret;
-    }
-});
-exports.extensionCodec.register({
-    type: 0,
-    encode: (object) => {
-        // 1. <for each key,value in the map
-        // 2. encode the key and value
-        // 3. put the key and value in a tmp array
-        // 4. encode the tmp array
-        // 5. push tmp into ret
-        // 6. <go back to step 1>
-        // 7. encode the ret array
-        // 8. return ret
-        if (object instanceof Map) {
-            let ret = [];
-            object.forEach((value, key) => {
-                let tmp = [];
-                tmp.push(msgpack_1.encode(key, { extensionCodec: exports.extensionCodec }));
-                tmp.push(msgpack_1.encode(value, { extensionCodec: exports.extensionCodec }));
-                ret.push(msgpack_1.encode(tmp, { extensionCodec: exports.extensionCodec }));
-            });
-            return msgpack_1.encode(ret, { extensionCodec: exports.extensionCodec });
-        }
-        else {
-            return null;
-        }
-    },
-    decode: (data) => {
-        let decdBigArray = msgpack_1.decode(data, { extensionCodec: exports.extensionCodec });
-        let ret = new Map();
-        decdBigArray.forEach((value) => {
-            let tmp = msgpack_1.decode(value, { extensionCodec: exports.extensionCodec });
-            ret.set(msgpack_1.decode(tmp[0], { extensionCodec: exports.extensionCodec }), msgpack_1.decode(tmp[1], { extensionCodec: exports.extensionCodec }));
-        });
-        return ret;
-    },
-});
-function encodeDb(db) {
-    db.parseErrors = [];
-    var encoded = msgpack_1.encode(db, { extensionCodec: exports.extensionCodec });
-    if (encoded.byteLength * 8 / 6 > 0x1fffffe7) {
-        // cannot create string longer than 512Mb
-        console.error("String too large!");
-        return "OVERLOADED STRING";
-    }
-    var encoded64 = b64.Base64.fromUint8Array(encoded);
-    return encoded64;
-}
-exports.encodeDb = encodeDb;
-function decodeDb(data) {
-    if (data == "OVERLOADED STRING") {
-        let ret = new db_1.Database();
-        ret.version = "Too large for parsing.";
-        return ret;
-    }
-    var u8array = b64.Base64.toUint8Array(data);
-    var decoded = msgpack_1.decode(u8array, { extensionCodec: exports.extensionCodec });
-    return decoded;
-}
-exports.decodeDb = decodeDb;
-
-
-/***/ }),
-
-/***/ 575:
-/***/ (function(module) {
+/***/ 127
+(module) {
 
 
 
@@ -1187,10 +351,847 @@ const gBase64 = {
 
 
 
-/***/ }),
+/***/ },
 
-/***/ 676:
-/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+/***/ 193
+(__unused_webpack_module, exports) {
+
+"use strict";
+
+/**
+ * Copyright (C) 2021 Landon Harris
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; version 2.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see
+ * <https://www.gnu.org/licenses/old-licenses/gpl-2.0-standalone.html>.
+*/
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Node = void 0;
+class Node {
+    constructor(name) {
+        this.name = name;
+        this.comment = "";
+        this.attributes = new Map();
+        this.clsType = "node";
+    }
+}
+exports.Node = Node;
+
+
+/***/ },
+
+/***/ 225
+(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+/**
+ * Copyright (C) 2022 Landon Harris
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; version 2.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see
+ * <https://www.gnu.org/licenses/old-licenses/gpl-2.0-standalone.html>.
+*/
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.extensionCodec = void 0;
+exports.encodeDb = encodeDb;
+exports.decodeDb = decodeDb;
+const msgpack_1 = __webpack_require__(986);
+const db_1 = __webpack_require__(774);
+const message_1 = __webpack_require__(797);
+const dbcNode_1 = __webpack_require__(193);
+const valtable_1 = __webpack_require__(105);
+const attributes_1 = __webpack_require__(297);
+const ev_1 = __webpack_require__(387);
+const signal_1 = __webpack_require__(392);
+const b64 = __webpack_require__(127);
+// DBCError elided
+exports.extensionCodec = new msgpack_1.ExtensionCodec();
+// Attribute
+exports.extensionCodec.register({
+    type: 2,
+    encode: (input) => {
+        if ((input === null || input === void 0 ? void 0 : input.clsType) == "attribute") {
+            let object = input;
+            var name = (0, msgpack_1.encode)(object.name, { extensionCodec: exports.extensionCodec });
+            var type = (0, msgpack_1.encode)(object.type, { extensionCodec: exports.extensionCodec });
+            var value = (0, msgpack_1.encode)(object.value, { extensionCodec: exports.extensionCodec });
+            return (0, msgpack_1.encode)([name, type, value], { extensionCodec: exports.extensionCodec });
+        }
+        else {
+            return null;
+        }
+    },
+    decode: (data) => {
+        const array = (0, msgpack_1.decode)(data, { extensionCodec: exports.extensionCodec });
+        return new attributes_1.Attribute((0, msgpack_1.decode)(array[0], { extensionCodec: exports.extensionCodec }), (0, msgpack_1.decode)(array[1], { extensionCodec: exports.extensionCodec }), (0, msgpack_1.decode)(array[2], { extensionCodec: exports.extensionCodec }));
+    }
+});
+// AttributeDef
+exports.extensionCodec.register({
+    type: 3,
+    encode: (input) => {
+        if ((input === null || input === void 0 ? void 0 : input.clsType) == "attributeDef") {
+            let object = input;
+            var name = (0, msgpack_1.encode)(object.name, { extensionCodec: exports.extensionCodec });
+            var type = (0, msgpack_1.encode)(object.objType, { extensionCodec: exports.extensionCodec });
+            var value = (0, msgpack_1.encode)(object.valType, { extensionCodec: exports.extensionCodec });
+            return (0, msgpack_1.encode)([name, type, value], { extensionCodec: exports.extensionCodec });
+        }
+        else
+            return null;
+    },
+    decode: (data) => {
+        const array = (0, msgpack_1.decode)(data, { extensionCodec: exports.extensionCodec });
+        return new attributes_1.AttributeDef((0, msgpack_1.decode)(array[0], { extensionCodec: exports.extensionCodec }), (0, msgpack_1.decode)(array[1], { extensionCodec: exports.extensionCodec }), (0, msgpack_1.decode)(array[2], { extensionCodec: exports.extensionCodec }));
+    }
+});
+// Node
+exports.extensionCodec.register({
+    type: 4,
+    encode: (input) => {
+        if ((input === null || input === void 0 ? void 0 : input.clsType) == "node") {
+            let object = input;
+            var name = (0, msgpack_1.encode)(object.name, { extensionCodec: exports.extensionCodec });
+            var comment = (0, msgpack_1.encode)(object.comment, { extensionCodec: exports.extensionCodec });
+            var attributes = (0, msgpack_1.encode)(object.attributes, { extensionCodec: exports.extensionCodec });
+            return (0, msgpack_1.encode)([name, comment, attributes], { extensionCodec: exports.extensionCodec });
+        }
+        else
+            return null;
+    },
+    decode: (data) => {
+        const array = (0, msgpack_1.decode)(data, { extensionCodec: exports.extensionCodec });
+        var ret = new dbcNode_1.Node((0, msgpack_1.decode)(array[0], { extensionCodec: exports.extensionCodec }));
+        ret.comment = (0, msgpack_1.decode)(array[1], { extensionCodec: exports.extensionCodec });
+        ret.attributes = (0, msgpack_1.decode)(array[2], { extensionCodec: exports.extensionCodec });
+        return ret;
+    }
+});
+// Environment Variable
+exports.extensionCodec.register({
+    type: 5,
+    encode: (input) => {
+        if ((input === null || input === void 0 ? void 0 : input.clsType) == "environmentVariable") {
+            let object = input;
+            var name = (0, msgpack_1.encode)(object.name, { extensionCodec: exports.extensionCodec });
+            var type = (0, msgpack_1.encode)(object.type, { extensionCodec: exports.extensionCodec });
+            var min = (0, msgpack_1.encode)(object.min, { extensionCodec: exports.extensionCodec });
+            var max = (0, msgpack_1.encode)(object.max, { extensionCodec: exports.extensionCodec });
+            var unit = (0, msgpack_1.encode)(object.unit, { extensionCodec: exports.extensionCodec });
+            var initialVal = (0, msgpack_1.encode)(object.initialVal, { extensionCodec: exports.extensionCodec });
+            var id = (0, msgpack_1.encode)(object.id, { extensionCodec: exports.extensionCodec });
+            var transmitters = (0, msgpack_1.encode)(object.transmitters, { extensionCodec: exports.extensionCodec });
+            var valueDescriptions = (0, msgpack_1.encode)(object.valueDescriptions, { extensionCodec: exports.extensionCodec });
+            var dataSize = (0, msgpack_1.encode)(object.dataSize, { extensionCodec: exports.extensionCodec });
+            var comment = (0, msgpack_1.encode)(object.comment, { extensionCodec: exports.extensionCodec });
+            var attributes = (0, msgpack_1.encode)(object.attributes, { extensionCodec: exports.extensionCodec });
+            return ((0, msgpack_1.encode)([name, type, min, max, unit, initialVal, id, transmitters, valueDescriptions, dataSize, comment, attributes]));
+        }
+        else
+            return null;
+    },
+    decode: (data) => {
+        const array = (0, msgpack_1.decode)(data, { extensionCodec: exports.extensionCodec });
+        var ret = new ev_1.EnvironmentVariable();
+        ret.name = (0, msgpack_1.decode)(array[0], { extensionCodec: exports.extensionCodec });
+        ret.type = (0, msgpack_1.decode)(array[1], { extensionCodec: exports.extensionCodec });
+        ret.min = (0, msgpack_1.decode)(array[2], { extensionCodec: exports.extensionCodec });
+        ret.max = (0, msgpack_1.decode)(array[3], { extensionCodec: exports.extensionCodec });
+        ret.unit = (0, msgpack_1.decode)(array[4], { extensionCodec: exports.extensionCodec });
+        ret.initialVal = (0, msgpack_1.decode)(array[5], { extensionCodec: exports.extensionCodec });
+        ret.id = (0, msgpack_1.decode)(array[6], { extensionCodec: exports.extensionCodec });
+        ret.transmitters = (0, msgpack_1.decode)(array[7], { extensionCodec: exports.extensionCodec });
+        ret.dataSize = (0, msgpack_1.decode)(array[8], { extensionCodec: exports.extensionCodec });
+        ret.comment = (0, msgpack_1.decode)(array[9], { extensionCodec: exports.extensionCodec });
+        ret.attributes = (0, msgpack_1.decode)(array[10], { extensionCodec: exports.extensionCodec });
+        return ret;
+    }
+});
+// message
+exports.extensionCodec.register({
+    type: 6,
+    encode: (input) => {
+        if ((input === null || input === void 0 ? void 0 : input.clsType) == "message") {
+            let object = input;
+            const id = (0, msgpack_1.encode)(object.id, { extensionCodec: exports.extensionCodec });
+            const name = (0, msgpack_1.encode)(object.name, { extensionCodec: exports.extensionCodec });
+            const size = (0, msgpack_1.encode)(object.size, { extensionCodec: exports.extensionCodec });
+            const transmitter = (0, msgpack_1.encode)(object.transmitter, { extensionCodec: exports.extensionCodec });
+            const transmitters = (0, msgpack_1.encode)(object.transmitters, { extensionCodec: exports.extensionCodec });
+            const signals = (0, msgpack_1.encode)(object.signals, { extensionCodec: exports.extensionCodec });
+            const comment = (0, msgpack_1.encode)(object.comment, { extensionCodec: exports.extensionCodec });
+            const signalGroups = (0, msgpack_1.encode)(object.signalGroups, { extensionCodec: exports.extensionCodec });
+            const attributes = (0, msgpack_1.encode)(object.attributes, { extensionCodec: exports.extensionCodec });
+            return (0, msgpack_1.encode)([id, name, size, transmitter, transmitters, signals, comment, signalGroups, attributes], { extensionCodec: exports.extensionCodec });
+        }
+        else
+            return null;
+    },
+    decode: (data) => {
+        const array = (0, msgpack_1.decode)(data, { extensionCodec: exports.extensionCodec });
+        var ret = new message_1.Message(0, // endLineNum
+        (0, msgpack_1.decode)(array[0], { extensionCodec: exports.extensionCodec }), // id
+        (0, msgpack_1.decode)(array[1], { extensionCodec: exports.extensionCodec }), // name
+        (0, msgpack_1.decode)(array[2], { extensionCodec: exports.extensionCodec }), // size
+        (0, msgpack_1.decode)(array[3], { extensionCodec: exports.extensionCodec }), // transmitter
+        (0, msgpack_1.decode)(array[5], { extensionCodec: exports.extensionCodec }) // signals
+        );
+        ret.transmitters = (0, msgpack_1.decode)(array[4], { extensionCodec: exports.extensionCodec });
+        ret.comment = (0, msgpack_1.decode)(array[6], { extensionCodec: exports.extensionCodec });
+        ret.signalGroups = (0, msgpack_1.decode)(array[7], { extensionCodec: exports.extensionCodec });
+        ret.attributes = (0, msgpack_1.decode)(array[8], { extensionCodec: exports.extensionCodec });
+        return ret;
+    }
+});
+// signal
+exports.extensionCodec.register({
+    type: 7,
+    encode: (input) => {
+        if ((input === null || input === void 0 ? void 0 : input.clsType) == "signal") {
+            let object = input;
+            const name = (0, msgpack_1.encode)(object.name, { extensionCodec: exports.extensionCodec });
+            const startBit = (0, msgpack_1.encode)(object.startBit, { extensionCodec: exports.extensionCodec });
+            const bitSize = (0, msgpack_1.encode)(object.bitSize, { extensionCodec: exports.extensionCodec });
+            const byteOrder = (0, msgpack_1.encode)(object.byteOrder, { extensionCodec: exports.extensionCodec });
+            const valueType = (0, msgpack_1.encode)(object.valueType, { extensionCodec: exports.extensionCodec });
+            const factor = (0, msgpack_1.encode)(object.factor, { extensionCodec: exports.extensionCodec });
+            const offset = (0, msgpack_1.encode)(object.offset, { extensionCodec: exports.extensionCodec });
+            const minimum = (0, msgpack_1.encode)(object.minimum, { extensionCodec: exports.extensionCodec });
+            const maximum = (0, msgpack_1.encode)(object.maximum, { extensionCodec: exports.extensionCodec });
+            const unit = (0, msgpack_1.encode)(object.unit, { extensionCodec: exports.extensionCodec });
+            const receivers = (0, msgpack_1.encode)(object.receivers, { extensionCodec: exports.extensionCodec });
+            const valTable = (0, msgpack_1.encode)(object.valTable, { extensionCodec: exports.extensionCodec });
+            const comment = (0, msgpack_1.encode)(object.comment, { extensionCodec: exports.extensionCodec });
+            const attributes = (0, msgpack_1.encode)(object.attributes, { extensionCodec: exports.extensionCodec });
+            const lineNum = (0, msgpack_1.encode)(object.lineNum, { extensionCodec: exports.extensionCodec });
+            return (0, msgpack_1.encode)([
+                name,
+                startBit,
+                bitSize,
+                byteOrder,
+                valueType,
+                factor,
+                offset,
+                minimum,
+                maximum,
+                unit,
+                receivers,
+                valTable,
+                comment,
+                attributes,
+                lineNum
+            ]);
+        }
+        else
+            return null;
+    },
+    decode: (data) => {
+        const array = (0, msgpack_1.decode)(data, { extensionCodec: exports.extensionCodec });
+        var ret = new signal_1.Signal((0, msgpack_1.decode)(array[14], { extensionCodec: exports.extensionCodec }), // lineNum
+        (0, msgpack_1.decode)(array[0], { extensionCodec: exports.extensionCodec }), // name
+        (0, msgpack_1.decode)(array[1], { extensionCodec: exports.extensionCodec }), // start
+        (0, msgpack_1.decode)(array[2], { extensionCodec: exports.extensionCodec }), // size
+        (0, msgpack_1.decode)(array[3], { extensionCodec: exports.extensionCodec }), // byte order
+        (0, msgpack_1.decode)(array[4], { extensionCodec: exports.extensionCodec }), // valtype
+        (0, msgpack_1.decode)(array[5], { extensionCodec: exports.extensionCodec }), // factor
+        (0, msgpack_1.decode)(array[6], { extensionCodec: exports.extensionCodec }), // offset
+        (0, msgpack_1.decode)(array[7], { extensionCodec: exports.extensionCodec }), // min
+        (0, msgpack_1.decode)(array[8], { extensionCodec: exports.extensionCodec }), // max
+        (0, msgpack_1.decode)(array[9], { extensionCodec: exports.extensionCodec }), // unit
+        (0, msgpack_1.decode)(array[10], { extensionCodec: exports.extensionCodec }) // receivers
+        );
+        ret.valTable = (0, msgpack_1.decode)(array[11], { extensionCodec: exports.extensionCodec });
+        ret.comment = (0, msgpack_1.decode)(array[12], { extensionCodec: exports.extensionCodec });
+        ret.attributes = (0, msgpack_1.decode)(array[13], { extensionCodec: exports.extensionCodec });
+        return ret;
+    }
+});
+// signalType
+exports.extensionCodec.register({
+    type: 8,
+    encode: (input) => {
+        if ((input === null || input === void 0 ? void 0 : input.clsType) == "signalType") {
+            let object = input;
+            const name = (0, msgpack_1.encode)(object.name, { extensionCodec: exports.extensionCodec });
+            const size = (0, msgpack_1.encode)(object.size, { extensionCodec: exports.extensionCodec });
+            const byteOrder = (0, msgpack_1.encode)(object.byteOrder, { extensionCodec: exports.extensionCodec });
+            const valueType = (0, msgpack_1.encode)(object.valueType, { extensionCodec: exports.extensionCodec });
+            const factor = (0, msgpack_1.encode)(object.factor, { extensionCodec: exports.extensionCodec });
+            const offset = (0, msgpack_1.encode)(object.offset, { extensionCodec: exports.extensionCodec });
+            const minimum = (0, msgpack_1.encode)(object.minimum, { extensionCodec: exports.extensionCodec });
+            const maximum = (0, msgpack_1.encode)(object.maximum, { extensionCodec: exports.extensionCodec });
+            const unit = (0, msgpack_1.encode)(object.unit, { extensionCodec: exports.extensionCodec });
+            const defaultVal = (0, msgpack_1.encode)(object.default, { extensionCodec: exports.extensionCodec });
+            const valTable = (0, msgpack_1.encode)(object.valTable, { extensionCodec: exports.extensionCodec });
+            return (0, msgpack_1.encode)([
+                name,
+                size,
+                byteOrder,
+                valueType,
+                factor,
+                offset,
+                minimum,
+                maximum,
+                unit,
+                defaultVal,
+                valTable
+            ]);
+        }
+        else
+            return null;
+    },
+    decode: (data) => {
+        const array = (0, msgpack_1.decode)(data, { extensionCodec: exports.extensionCodec });
+        var ret = new signal_1.SignalType((0, msgpack_1.decode)(array[0], { extensionCodec: exports.extensionCodec }), // name
+        (0, msgpack_1.decode)(array[1], { extensionCodec: exports.extensionCodec }), // size
+        (0, msgpack_1.decode)(array[2], { extensionCodec: exports.extensionCodec }), // byte order
+        (0, msgpack_1.decode)(array[3], { extensionCodec: exports.extensionCodec }), // valtype
+        (0, msgpack_1.decode)(array[4], { extensionCodec: exports.extensionCodec }), // factor
+        (0, msgpack_1.decode)(array[5], { extensionCodec: exports.extensionCodec }), // offset
+        (0, msgpack_1.decode)(array[6], { extensionCodec: exports.extensionCodec }), // min
+        (0, msgpack_1.decode)(array[7], { extensionCodec: exports.extensionCodec }), // max
+        (0, msgpack_1.decode)(array[8], { extensionCodec: exports.extensionCodec }), // unit
+        (0, msgpack_1.decode)(array[9], { extensionCodec: exports.extensionCodec }), // defaultVal
+        (0, msgpack_1.decode)(array[10], { extensionCodec: exports.extensionCodec }) // valTable
+        );
+        return ret;
+    }
+});
+// SignalGroup
+exports.extensionCodec.register({
+    type: 9,
+    encode: (input) => {
+        if ((input === null || input === void 0 ? void 0 : input.clsType) == "signalGroup") {
+            let object = input;
+            return (0, msgpack_1.encode)([
+                (0, msgpack_1.encode)(object.messageId, { extensionCodec: exports.extensionCodec }),
+                (0, msgpack_1.encode)(object.name, { extensionCodec: exports.extensionCodec }),
+                (0, msgpack_1.encode)(object.repetitions, { extensionCodec: exports.extensionCodec }),
+                (0, msgpack_1.encode)(object.signals, { extensionCodec: exports.extensionCodec })
+            ]);
+        }
+        else
+            return null;
+    },
+    decode: (data) => {
+        const array = (0, msgpack_1.decode)(data, { extensionCodec: exports.extensionCodec });
+        var ret = new signal_1.SignalGroup();
+        ret.messageId = (0, msgpack_1.decode)(array[0], { extensionCodec: exports.extensionCodec });
+        ret.name = (0, msgpack_1.decode)(array[1], { extensionCodec: exports.extensionCodec });
+        ret.repetitions = (0, msgpack_1.decode)(array[2], { extensionCodec: exports.extensionCodec });
+        ret.signals = (0, msgpack_1.decode)(array[3], { extensionCodec: exports.extensionCodec });
+        return ret;
+    }
+});
+// ValTable
+exports.extensionCodec.register({
+    type: 10,
+    encode: (input) => {
+        if ((input === null || input === void 0 ? void 0 : input.clsType) == "valTable") {
+            let object = input;
+            return (0, msgpack_1.encode)([
+                (0, msgpack_1.encode)(object.name, { extensionCodec: exports.extensionCodec }),
+                (0, msgpack_1.encode)(object.descriptions, { extensionCodec: exports.extensionCodec })
+            ]);
+        }
+        else
+            return null;
+    },
+    decode: (data) => {
+        const array = (0, msgpack_1.decode)(data, { extensionCodec: exports.extensionCodec });
+        var ret = new valtable_1.ValTable((0, msgpack_1.decode)(array[0], { extensionCodec: exports.extensionCodec }));
+        ret.descriptions = (0, msgpack_1.decode)(array[1], { extensionCodec: exports.extensionCodec });
+        return ret;
+    }
+});
+// ValueType
+exports.extensionCodec.register({
+    type: 11,
+    encode: (input) => {
+        if ((input === null || input === void 0 ? void 0 : input.clsType) == "valueType") {
+            let object = input;
+            return (0, msgpack_1.encode)([
+                (0, msgpack_1.encode)(object.type, { extensionCodec: exports.extensionCodec }),
+                (0, msgpack_1.encode)(object.min, { extensionCodec: exports.extensionCodec }),
+                (0, msgpack_1.encode)(object.max, { extensionCodec: exports.extensionCodec }),
+                (0, msgpack_1.encode)(object.enumVals, { extensionCodec: exports.extensionCodec })
+            ]);
+        }
+        else
+            return null;
+    },
+    decode: (data) => {
+        const array = (0, msgpack_1.decode)(data, { extensionCodec: exports.extensionCodec });
+        var ret = new valtable_1.ValueType((0, msgpack_1.decode)(array[0], { extensionCodec: exports.extensionCodec }));
+        ret.min = (0, msgpack_1.decode)(array[1], { extensionCodec: exports.extensionCodec });
+        ret.max = (0, msgpack_1.decode)(array[2], { extensionCodec: exports.extensionCodec });
+        ret.enumVals = (0, msgpack_1.decode)(array[3], { extensionCodec: exports.extensionCodec });
+        return ret;
+    }
+});
+// Database
+exports.extensionCodec.register({
+    type: 1,
+    encode: (input) => {
+        if ((input === null || input === void 0 ? void 0 : input.type) == "database") {
+            let object = input;
+            var msgs = (0, msgpack_1.encode)(object.messages, { extensionCodec: exports.extensionCodec });
+            var valTables = (0, msgpack_1.encode)(object.valTables, { extensionCodec: exports.extensionCodec });
+            var nodes = (0, msgpack_1.encode)(object.nodes, { extensionCodec: exports.extensionCodec });
+            var environmentVariables = (0, msgpack_1.encode)(object.environmentVariables, { extensionCodec: exports.extensionCodec });
+            var signalTypes = (0, msgpack_1.encode)(object.signalTypes, { extensionCodec: exports.extensionCodec });
+            var attrDefs = (0, msgpack_1.encode)(object.attrDefs, { extensionCodec: exports.extensionCodec });
+            var attrs = (0, msgpack_1.encode)(object.attributes, { extensionCodec: exports.extensionCodec });
+            var version = (0, msgpack_1.encode)(object.version, { extensionCodec: exports.extensionCodec });
+            var comment = (0, msgpack_1.encode)(object.comment, { extensionCodec: exports.extensionCodec });
+            var filename = (0, msgpack_1.encode)(object.fileName, { extensionCodec: exports.extensionCodec });
+            return (0, msgpack_1.encode)([version, filename, comment, msgs, valTables, nodes, environmentVariables, signalTypes, attrDefs, attrs], { extensionCodec: exports.extensionCodec });
+        }
+        else {
+            return null;
+        }
+    },
+    decode: (data) => {
+        const array = (0, msgpack_1.decode)(data, { extensionCodec: exports.extensionCodec });
+        var ret = new db_1.Database();
+        ret.version = (0, msgpack_1.decode)(array[0], { extensionCodec: exports.extensionCodec });
+        ret.fileName = (0, msgpack_1.decode)(array[1], { extensionCodec: exports.extensionCodec });
+        ret.comment = (0, msgpack_1.decode)(array[2], { extensionCodec: exports.extensionCodec });
+        ret.messages = (0, msgpack_1.decode)(array[3], { extensionCodec: exports.extensionCodec });
+        ret.valTables = (0, msgpack_1.decode)(array[4], { extensionCodec: exports.extensionCodec });
+        ret.nodes = (0, msgpack_1.decode)(array[5], { extensionCodec: exports.extensionCodec });
+        ret.environmentVariables = (0, msgpack_1.decode)(array[6], { extensionCodec: exports.extensionCodec });
+        ret.signalTypes = (0, msgpack_1.decode)(array[7], { extensionCodec: exports.extensionCodec });
+        ret.attrDefs = (0, msgpack_1.decode)(array[8], { extensionCodec: exports.extensionCodec });
+        ret.attributes = (0, msgpack_1.decode)(array[9], { extensionCodec: exports.extensionCodec });
+        return ret;
+    }
+});
+exports.extensionCodec.register({
+    type: 0,
+    encode: (object) => {
+        // 1. <for each key,value in the map
+        // 2. encode the key and value
+        // 3. put the key and value in a tmp array
+        // 4. encode the tmp array
+        // 5. push tmp into ret
+        // 6. <go back to step 1>
+        // 7. encode the ret array
+        // 8. return ret
+        if (object instanceof Map) {
+            let ret = [];
+            object.forEach((value, key) => {
+                let tmp = [];
+                tmp.push((0, msgpack_1.encode)(key, { extensionCodec: exports.extensionCodec }));
+                tmp.push((0, msgpack_1.encode)(value, { extensionCodec: exports.extensionCodec }));
+                ret.push((0, msgpack_1.encode)(tmp, { extensionCodec: exports.extensionCodec }));
+            });
+            return (0, msgpack_1.encode)(ret, { extensionCodec: exports.extensionCodec });
+        }
+        else {
+            return null;
+        }
+    },
+    decode: (data) => {
+        let decdBigArray = (0, msgpack_1.decode)(data, { extensionCodec: exports.extensionCodec });
+        let ret = new Map();
+        decdBigArray.forEach((value) => {
+            let tmp = (0, msgpack_1.decode)(value, { extensionCodec: exports.extensionCodec });
+            ret.set((0, msgpack_1.decode)(tmp[0], { extensionCodec: exports.extensionCodec }), (0, msgpack_1.decode)(tmp[1], { extensionCodec: exports.extensionCodec }));
+        });
+        return ret;
+    },
+});
+function encodeDb(db) {
+    db.parseErrors = [];
+    var encoded = (0, msgpack_1.encode)(db, { extensionCodec: exports.extensionCodec });
+    if (encoded.byteLength * 8 / 6 > 0x1fffffe7) {
+        // cannot create string longer than 512Mb
+        console.error("String too large!");
+        return "OVERLOADED STRING";
+    }
+    var encoded64 = b64.Base64.fromUint8Array(encoded);
+    return encoded64;
+}
+function decodeDb(data) {
+    if (data == "OVERLOADED STRING") {
+        let ret = new db_1.Database();
+        ret.version = "Too large for parsing.";
+        return ret;
+    }
+    var u8array = b64.Base64.toUint8Array(data);
+    var decoded = (0, msgpack_1.decode)(u8array, { extensionCodec: exports.extensionCodec });
+    return decoded;
+}
+
+
+/***/ },
+
+/***/ 297
+(__unused_webpack_module, exports) {
+
+"use strict";
+
+/**
+ * Copyright (C) 2021 Landon Harris
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; version 2.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see
+ * <https://www.gnu.org/licenses/old-licenses/gpl-2.0-standalone.html>.
+*/
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.AttributeDef = exports.Attribute = void 0;
+class Attribute {
+    constructor(name, objectType, value) {
+        this.name = name;
+        this.type = objectType;
+        this.value = value;
+        this.clsType = "attribute";
+    }
+}
+exports.Attribute = Attribute;
+class AttributeDef {
+    constructor(name, objType, valType) {
+        this.name = name;
+        this.objType = objType;
+        this.valType = valType;
+        this.clsType = "attributeDef";
+    }
+}
+exports.AttributeDef = AttributeDef;
+
+
+/***/ },
+
+/***/ 387
+(__unused_webpack_module, exports) {
+
+"use strict";
+
+/**
+ * Copyright (C) 2021 Landon Harris
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; version 2.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see
+ * <https://www.gnu.org/licenses/old-licenses/gpl-2.0-standalone.html>.
+*/
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.EnvironmentVariable = void 0;
+class EnvironmentVariable {
+    constructor() {
+        this.name = "";
+        this.type = 2;
+        this.min = -1;
+        this.max = 0;
+        this.unit = "";
+        this.initialVal = 0;
+        this.id = 0;
+        this.transmitters = [];
+        this.valueDescriptions = new Map();
+        this.dataSize = 0; // used when ENVVAR_DATA is present
+        this.comment = "";
+        this.attributes = new Map();
+        this.clsType = "environmentVariable";
+    }
+}
+exports.EnvironmentVariable = EnvironmentVariable;
+
+
+/***/ },
+
+/***/ 392
+(__unused_webpack_module, exports) {
+
+"use strict";
+
+/**
+ * Copyright (C) 2021 Landon Harris
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; version 2.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see
+ * <https://www.gnu.org/licenses/old-licenses/gpl-2.0-standalone.html>.
+*/
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.SignalGroup = exports.SignalType = exports.Signal = void 0;
+class Signal {
+    constructor(lineNo, Name, Start, Size, Order, Type, Factor, Offset, Min, Max, Unit, Receivers, MultiplexIndicator = null) {
+        this.name = Name;
+        this.startBit = Start;
+        this.bitSize = Size;
+        this.byteOrder = Order;
+        this.valueType = Type;
+        this.factor = Factor;
+        this.offset = Offset;
+        this.minimum = Min;
+        this.maximum = Max;
+        this.unit = Unit;
+        this.receivers = Receivers;
+        this.valTable = null;
+        this.comment = "";
+        this.attributes = new Map();
+        this.lineNum = lineNo;
+        this.clsType = "signal";
+        this.multiplexIndicator = MultiplexIndicator;
+    }
+}
+exports.Signal = Signal;
+class SignalType {
+    constructor(name, size, byteOrder, valueType, factor, offset, min, max, unit, defaultVal, valTable) {
+        this.name = name;
+        this.size = size;
+        this.byteOrder = byteOrder;
+        this.valueType = valueType;
+        this.factor = factor;
+        this.offset = offset;
+        this.minimum = min;
+        this.maximum = max;
+        this.unit = unit;
+        this.default = defaultVal;
+        this.valTable = valTable;
+        this.clsType = "signalType";
+    }
+}
+exports.SignalType = SignalType;
+class SignalGroup {
+    constructor() {
+        this.messageId = 0;
+        this.name = "";
+        this.repetitions = 0;
+        this.signals = [];
+        this.clsType = "signalGroup";
+    }
+}
+exports.SignalGroup = SignalGroup;
+
+
+/***/ },
+
+/***/ 407
+(__unused_webpack_module, exports) {
+
+"use strict";
+
+/**
+ * Copyright (C) 2021 Landon Harris
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; version 2.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see
+ * <https://www.gnu.org/licenses/old-licenses/gpl-2.0-standalone.html>.
+*/
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.DBCError = void 0;
+var conditionType;
+(function (conditionType) {
+    conditionType[conditionType["noCondition"] = 0] = "noCondition";
+    conditionType[conditionType["mapHas"] = 1] = "mapHas";
+})(conditionType || (conditionType = {}));
+class DBCError {
+    constructor(whence, what, type, // 0: warning, 1: error
+    token = "") {
+        this.whence = whence;
+        this.what = what;
+        this.type = type;
+        this.token = token;
+        this.hasCondition = false;
+        this.condition = conditionType.noCondition;
+        this.mapVal = null;
+        this.key = null;
+    }
+    evalCondition() {
+        // returns false if error needs to be added
+        if (!this.hasCondition)
+            return false;
+        switch (this.condition) {
+            case conditionType.noCondition:
+                return false;
+            case conditionType.mapHas:
+                return this.evalMapCondition();
+            default:
+                break;
+        }
+    }
+    addMapCondition(mapVal, key) {
+        this.mapVal = mapVal;
+        this.key = key;
+        this.condition = conditionType.mapHas;
+        this.hasCondition = true;
+    }
+    evalMapCondition() {
+        if (this.mapVal === null || this.key === null)
+            // no condition set. unconditional error, so always add
+            return false;
+        else if (this.mapVal === undefined)
+            // map doest exist so there's no way the key is in it. 
+            return false;
+        else {
+            // console.log("checking map condition", this.mapVal, this.key, this.mapVal.has(this.key));
+            if (this.mapVal.has(this.key))
+                return true;
+            else
+                return false;
+        }
+    }
+    isMapCondition() {
+        return this.condition == conditionType.mapHas;
+    }
+}
+exports.DBCError = DBCError;
+
+
+/***/ },
+
+/***/ 774
+(__unused_webpack_module, exports) {
+
+"use strict";
+
+/**
+ * Copyright (C) 2021 Landon Harris
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; version 2.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see
+ * <https://www.gnu.org/licenses/old-licenses/gpl-2.0-standalone.html>.
+*/
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Database = void 0;
+;
+class Database {
+    constructor() {
+        this.messages = new Map();
+        this.valTables = new Map();
+        this.version = "";
+        this.symbols = [];
+        this.parseErrors = [];
+        this.bitTiming = {
+            baudRate: -1,
+            register_1: -1,
+            register_2: -1
+        };
+        this.nodes = new Map();
+        this.environmentVariables = new Map();
+        this.signalTypes = new Map();
+        this.comment = "";
+        this.attrDefs = new Map();
+        this.attributes = new Map();
+        this.fileName = "";
+        this.type = "database";
+    }
+}
+exports.Database = Database;
+Database.identifier = "Database";
+
+
+/***/ },
+
+/***/ 797
+(__unused_webpack_module, exports) {
+
+"use strict";
+
+/**
+ * Copyright (C) 2021 Landon Harris
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; version 2.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see
+ * <https://www.gnu.org/licenses/old-licenses/gpl-2.0-standalone.html>.
+*/
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Message = void 0;
+class Message {
+    constructor(endLineNum, Id, Name, Size, Transmitter, Signals) {
+        this.id = Id;
+        this.name = Name;
+        this.size = Size;
+        this.transmitter = Transmitter;
+        this.signals = Signals;
+        this.comment = "";
+        this.transmitters = [];
+        this.signalGroups = new Map();
+        this.attributes = new Map();
+        this.endNum = endLineNum;
+        this.clsType = "message";
+    }
+    get lineNum() {
+        return this.endNum - this.signals.size;
+    }
+    represent() {
+        var hex = this.id.toString(16).padStart(3, "000").toUpperCase();
+        var dec = this.id.toString(10).padStart(4, "0000");
+        return `0x${hex} (${dec}) ${this.name}`;
+    }
+}
+exports.Message = Message;
+
+
+/***/ },
+
+/***/ 986
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 // ESM COMPAT FLAG
@@ -1198,28 +1199,28 @@ __webpack_require__.r(__webpack_exports__);
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  "DataViewIndexOutOfBoundsError": () => (/* reexport */ DataViewIndexOutOfBoundsError),
-  "DecodeError": () => (/* reexport */ DecodeError),
-  "Decoder": () => (/* reexport */ Decoder),
-  "EXT_TIMESTAMP": () => (/* reexport */ EXT_TIMESTAMP),
-  "Encoder": () => (/* reexport */ Encoder),
-  "ExtData": () => (/* reexport */ ExtData),
-  "ExtensionCodec": () => (/* reexport */ ExtensionCodec),
-  "decode": () => (/* reexport */ decode),
-  "decodeArrayStream": () => (/* reexport */ decodeArrayStream),
-  "decodeAsync": () => (/* reexport */ decodeAsync),
-  "decodeMulti": () => (/* reexport */ decodeMulti),
-  "decodeMultiStream": () => (/* reexport */ decodeMultiStream),
-  "decodeStream": () => (/* reexport */ decodeStream),
-  "decodeTimestampExtension": () => (/* reexport */ decodeTimestampExtension),
-  "decodeTimestampToTimeSpec": () => (/* reexport */ decodeTimestampToTimeSpec),
-  "encode": () => (/* reexport */ encode),
-  "encodeDateToTimeSpec": () => (/* reexport */ encodeDateToTimeSpec),
-  "encodeTimeSpecToTimestamp": () => (/* reexport */ encodeTimeSpecToTimestamp),
-  "encodeTimestampExtension": () => (/* reexport */ encodeTimestampExtension)
+  DataViewIndexOutOfBoundsError: () => (/* reexport */ DataViewIndexOutOfBoundsError),
+  DecodeError: () => (/* reexport */ DecodeError),
+  Decoder: () => (/* reexport */ Decoder),
+  EXT_TIMESTAMP: () => (/* reexport */ EXT_TIMESTAMP),
+  Encoder: () => (/* reexport */ Encoder),
+  ExtData: () => (/* reexport */ ExtData),
+  ExtensionCodec: () => (/* reexport */ ExtensionCodec),
+  decode: () => (/* reexport */ decode),
+  decodeArrayStream: () => (/* reexport */ decodeArrayStream),
+  decodeAsync: () => (/* reexport */ decodeAsync),
+  decodeMulti: () => (/* reexport */ decodeMulti),
+  decodeMultiStream: () => (/* reexport */ decodeMultiStream),
+  decodeStream: () => (/* reexport */ decodeStream),
+  decodeTimestampExtension: () => (/* reexport */ decodeTimestampExtension),
+  decodeTimestampToTimeSpec: () => (/* reexport */ decodeTimestampToTimeSpec),
+  encode: () => (/* reexport */ encode),
+  encodeDateToTimeSpec: () => (/* reexport */ encodeDateToTimeSpec),
+  encodeTimeSpecToTimestamp: () => (/* reexport */ encodeTimeSpecToTimestamp),
+  encodeTimestampExtension: () => (/* reexport */ encodeTimestampExtension)
 });
 
-;// CONCATENATED MODULE: ./node_modules/@msgpack/msgpack/dist.es5+esm/utils/int.mjs
+;// ./node_modules/@msgpack/msgpack/dist.es5+esm/utils/int.mjs
 // Integer Utility
 var UINT32_MAX = 4294967295;
 // DataView extension to handle int64 / uint64,
@@ -1247,7 +1248,7 @@ function getUint64(view, offset) {
     return high * 4294967296 + low;
 }
 //# sourceMappingURL=int.mjs.map
-;// CONCATENATED MODULE: ./node_modules/@msgpack/msgpack/dist.es5+esm/utils/utf8.mjs
+;// ./node_modules/@msgpack/msgpack/dist.es5+esm/utils/utf8.mjs
 
 var TEXT_ENCODING_AVAILABLE = (typeof process === "undefined" || process.env["TEXT_ENCODING"] !== "never") &&
     typeof TextEncoder !== "undefined" &&
@@ -1406,7 +1407,7 @@ function utf8DecodeTD(bytes, inputOffset, byteLength) {
     return sharedTextDecoder.decode(stringBytes);
 }
 //# sourceMappingURL=utf8.mjs.map
-;// CONCATENATED MODULE: ./node_modules/@msgpack/msgpack/dist.es5+esm/ExtData.mjs
+;// ./node_modules/@msgpack/msgpack/dist.es5+esm/ExtData.mjs
 /**
  * ExtData is used to handle Extension Types that are not registered to ExtensionCodec.
  */
@@ -1419,7 +1420,7 @@ var ExtData = /** @class */ (function () {
 }());
 
 //# sourceMappingURL=ExtData.mjs.map
-;// CONCATENATED MODULE: ./node_modules/@msgpack/msgpack/dist.es5+esm/DecodeError.mjs
+;// ./node_modules/@msgpack/msgpack/dist.es5+esm/DecodeError.mjs
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -1453,7 +1454,7 @@ var DecodeError = /** @class */ (function (_super) {
 }(Error));
 
 //# sourceMappingURL=DecodeError.mjs.map
-;// CONCATENATED MODULE: ./node_modules/@msgpack/msgpack/dist.es5+esm/timestamp.mjs
+;// ./node_modules/@msgpack/msgpack/dist.es5+esm/timestamp.mjs
 // https://github.com/msgpack/msgpack/blob/master/spec.md#timestamp-extension-type
 
 
@@ -1551,7 +1552,7 @@ var timestampExtension = {
     decode: decodeTimestampExtension,
 };
 //# sourceMappingURL=timestamp.mjs.map
-;// CONCATENATED MODULE: ./node_modules/@msgpack/msgpack/dist.es5+esm/ExtensionCodec.mjs
+;// ./node_modules/@msgpack/msgpack/dist.es5+esm/ExtensionCodec.mjs
 // ExtensionCodec to handle MessagePack extensions
 
 
@@ -1623,7 +1624,7 @@ var ExtensionCodec = /** @class */ (function () {
 }());
 
 //# sourceMappingURL=ExtensionCodec.mjs.map
-;// CONCATENATED MODULE: ./node_modules/@msgpack/msgpack/dist.es5+esm/utils/typedArrays.mjs
+;// ./node_modules/@msgpack/msgpack/dist.es5+esm/utils/typedArrays.mjs
 function ensureUint8Array(buffer) {
     if (buffer instanceof Uint8Array) {
         return buffer;
@@ -1647,7 +1648,7 @@ function createDataView(buffer) {
     return new DataView(bufferView.buffer, bufferView.byteOffset, bufferView.byteLength);
 }
 //# sourceMappingURL=typedArrays.mjs.map
-;// CONCATENATED MODULE: ./node_modules/@msgpack/msgpack/dist.es5+esm/Encoder.mjs
+;// ./node_modules/@msgpack/msgpack/dist.es5+esm/Encoder.mjs
 
 
 
@@ -2055,7 +2056,7 @@ var Encoder = /** @class */ (function () {
 }());
 
 //# sourceMappingURL=Encoder.mjs.map
-;// CONCATENATED MODULE: ./node_modules/@msgpack/msgpack/dist.es5+esm/encode.mjs
+;// ./node_modules/@msgpack/msgpack/dist.es5+esm/encode.mjs
 
 var defaultEncodeOptions = {};
 /**
@@ -2070,12 +2071,12 @@ function encode(value, options) {
     return encoder.encode(value);
 }
 //# sourceMappingURL=encode.mjs.map
-;// CONCATENATED MODULE: ./node_modules/@msgpack/msgpack/dist.es5+esm/utils/prettyByte.mjs
+;// ./node_modules/@msgpack/msgpack/dist.es5+esm/utils/prettyByte.mjs
 function prettyByte(byte) {
     return (byte < 0 ? "-" : "") + "0x" + Math.abs(byte).toString(16).padStart(2, "0");
 }
 //# sourceMappingURL=prettyByte.mjs.map
-;// CONCATENATED MODULE: ./node_modules/@msgpack/msgpack/dist.es5+esm/CachedKeyDecoder.mjs
+;// ./node_modules/@msgpack/msgpack/dist.es5+esm/CachedKeyDecoder.mjs
 
 var DEFAULT_MAX_KEY_LENGTH = 16;
 var DEFAULT_MAX_LENGTH_PER_KEY = 16;
@@ -2140,7 +2141,7 @@ var CachedKeyDecoder = /** @class */ (function () {
 }());
 
 //# sourceMappingURL=CachedKeyDecoder.mjs.map
-;// CONCATENATED MODULE: ./node_modules/@msgpack/msgpack/dist.es5+esm/Decoder.mjs
+;// ./node_modules/@msgpack/msgpack/dist.es5+esm/Decoder.mjs
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -2415,7 +2416,8 @@ var Decoder = /** @class */ (function () {
                         _b.trys.push([4, 9, , 10]);
                         _b.label = 5;
                     case 5:
-                        if (false) {}
+                        if (false) // removed by dead control flow
+{}
                         return [4 /*yield*/, __await(this.doDecodeSync())];
                     case 6: return [4 /*yield*/, _b.sent()];
                     case 7:
@@ -2875,7 +2877,7 @@ var Decoder = /** @class */ (function () {
 }());
 
 //# sourceMappingURL=Decoder.mjs.map
-;// CONCATENATED MODULE: ./node_modules/@msgpack/msgpack/dist.es5+esm/decode.mjs
+;// ./node_modules/@msgpack/msgpack/dist.es5+esm/decode.mjs
 
 var defaultDecodeOptions = {};
 /**
@@ -2899,7 +2901,7 @@ function decodeMulti(buffer, options) {
     return decoder.decodeMulti(buffer);
 }
 //# sourceMappingURL=decode.mjs.map
-;// CONCATENATED MODULE: ./node_modules/@msgpack/msgpack/dist.es5+esm/utils/stream.mjs
+;// ./node_modules/@msgpack/msgpack/dist.es5+esm/utils/stream.mjs
 // utility for whatwg streams
 var stream_generator = (undefined && undefined.__generator) || function (thisArg, body) {
     var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
@@ -2960,7 +2962,8 @@ function asyncIterableFromStream(stream) {
                     _b.trys.push([1, , 9, 10]);
                     _b.label = 2;
                 case 2:
-                    if (false) {}
+                    if (false) // removed by dead control flow
+{}
                     return [4 /*yield*/, stream_await(reader.read())];
                 case 3:
                     _a = _b.sent(), done = _a.done, value = _a.value;
@@ -2992,7 +2995,7 @@ function ensureAsyncIterable(streamLike) {
     }
 }
 //# sourceMappingURL=stream.mjs.map
-;// CONCATENATED MODULE: ./node_modules/@msgpack/msgpack/dist.es5+esm/decodeAsync.mjs
+;// ./node_modules/@msgpack/msgpack/dist.es5+esm/decodeAsync.mjs
 var decodeAsync_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -3063,7 +3066,7 @@ function decodeStream(streamLike, options) {
     return decodeMultiStream(streamLike, options);
 }
 //# sourceMappingURL=decodeAsync.mjs.map
-;// CONCATENATED MODULE: ./node_modules/@msgpack/msgpack/dist.es5+esm/index.mjs
+;// ./node_modules/@msgpack/msgpack/dist.es5+esm/index.mjs
 // Main Functions:
 
 
@@ -3085,7 +3088,7 @@ function decodeStream(streamLike, options) {
 
 //# sourceMappingURL=index.mjs.map
 
-/***/ })
+/***/ }
 
 /******/ 	});
 /************************************************************************/
@@ -3144,7 +3147,7 @@ function decodeStream(streamLike, options) {
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be in strict mode.
+// This entry needs to be wrapped in an IIFE because it needs to be in strict mode.
 (() => {
 "use strict";
 var exports = __webpack_exports__;
@@ -3166,28 +3169,28 @@ var exports = __webpack_exports__;
 */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ValueType = exports.ValTable = exports.SignalGroup = exports.SignalType = exports.Signal = exports.Node = exports.Message = exports.EnvironmentVariable = exports.Database = exports.DBCError = exports.AttributeDef = exports.Attribute = exports.decodeDb = exports.encodeDb = exports.extensionCodec = void 0;
-var mapTools_1 = __webpack_require__(164);
+var mapTools_1 = __webpack_require__(225);
 Object.defineProperty(exports, "extensionCodec", ({ enumerable: true, get: function () { return mapTools_1.extensionCodec; } }));
 Object.defineProperty(exports, "encodeDb", ({ enumerable: true, get: function () { return mapTools_1.encodeDb; } }));
 Object.defineProperty(exports, "decodeDb", ({ enumerable: true, get: function () { return mapTools_1.decodeDb; } }));
-var attributes_1 = __webpack_require__(271);
+var attributes_1 = __webpack_require__(297);
 Object.defineProperty(exports, "Attribute", ({ enumerable: true, get: function () { return attributes_1.Attribute; } }));
 Object.defineProperty(exports, "AttributeDef", ({ enumerable: true, get: function () { return attributes_1.AttributeDef; } }));
-var errors_1 = __webpack_require__(237);
+var errors_1 = __webpack_require__(407);
 Object.defineProperty(exports, "DBCError", ({ enumerable: true, get: function () { return errors_1.DBCError; } }));
-var db_1 = __webpack_require__(761);
+var db_1 = __webpack_require__(774);
 Object.defineProperty(exports, "Database", ({ enumerable: true, get: function () { return db_1.Database; } }));
-var ev_1 = __webpack_require__(276);
+var ev_1 = __webpack_require__(387);
 Object.defineProperty(exports, "EnvironmentVariable", ({ enumerable: true, get: function () { return ev_1.EnvironmentVariable; } }));
-var message_1 = __webpack_require__(780);
+var message_1 = __webpack_require__(797);
 Object.defineProperty(exports, "Message", ({ enumerable: true, get: function () { return message_1.Message; } }));
-var dbcNode_1 = __webpack_require__(7);
+var dbcNode_1 = __webpack_require__(193);
 Object.defineProperty(exports, "Node", ({ enumerable: true, get: function () { return dbcNode_1.Node; } }));
-var signal_1 = __webpack_require__(730);
+var signal_1 = __webpack_require__(392);
 Object.defineProperty(exports, "Signal", ({ enumerable: true, get: function () { return signal_1.Signal; } }));
 Object.defineProperty(exports, "SignalType", ({ enumerable: true, get: function () { return signal_1.SignalType; } }));
 Object.defineProperty(exports, "SignalGroup", ({ enumerable: true, get: function () { return signal_1.SignalGroup; } }));
-var valtable_1 = __webpack_require__(112);
+var valtable_1 = __webpack_require__(105);
 Object.defineProperty(exports, "ValTable", ({ enumerable: true, get: function () { return valtable_1.ValTable; } }));
 Object.defineProperty(exports, "ValueType", ({ enumerable: true, get: function () { return valtable_1.ValueType; } }));
 

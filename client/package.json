@@ -2,15 +2,9 @@
   "name": "dbc-client",
   "repository": {
     "type": "git",
-    "url": "https://github.com/lharri73/DBC-Language-Syntax"
+    "url": "https://github.com/n0rbury/DBC-Insight"
   },
-  "description": "DBC language server client",
-  "license": "GPL-2.0-only",
-  "version": "0.0.1",
-  "engines": {
-    "vscode": "^1.52.0"
-  },
-  "publisher": "lharri73",
+  "publisher": "n0rbury",
   "activationEvents": [
     "onCommand:dbc.showWebview"
   ],
@@ -30,7 +24,10 @@
     "@types/react-dom": "^17.0.8",
     "@types/vscode": "^1.1.17",
     "rewire": "^4.0.1",
-    "typescript": "^3.7.0"
+    "ts-loader": "^8.4.0",
+    "typescript": "^3.7.0",
+    "webpack": "^5.104.1",
+    "webpack-cli": "^4.10.0"
   },
   "browserslist": [
     ">0.2%",
