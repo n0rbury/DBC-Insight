@@ -25,7 +25,7 @@
 		"canbus",
 		"j1939"
 	],
-	"icon": "res/logo.svg",
+	"icon": "res/image.png",
 	"galleryBanner": {
 		"color": "#C62828",
 		"theme": "dark"

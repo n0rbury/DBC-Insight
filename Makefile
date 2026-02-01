@@ -59,4 +59,5 @@ clean:
 
 .PHONY: package
 package: $(dbclib) $(client) $(server) syntaxes
-	vsce package
+	npx vsce package
+

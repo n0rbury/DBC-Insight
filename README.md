@@ -1,6 +1,6 @@
 # DBC Insight
 
-![DBC Insight Logo](res/logo.svg)
+![DBC Insight Logo](res/image.png)
 
 [![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/n0rbury.dbc-insight?style=flat-square)](https://marketplace.visualstudio.com/items?itemName=n0rbury.dbc-insight)
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/n0rbury/DBC-Insight/DBC%20Insight%20CI?style=flat-square)
