@@ -1,4 +1,5 @@
 # Copyright (C) 2022  Landon Harris
+# Copyright (C) 2026  Jiaqi Chen (n0rbury)
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,18 +25,13 @@ client: $(client)
 server: $(server)
 dbclib: $(dbclib)
 
-$(dbclib): $(wildcard dbcLib/*.ts) $(wildcard dbcLib/dbc/*.ts)
-	cd dbcLib && tsc && webpack --mode production
-	rm -rf ./{client,server}/dbcLib
-	mkdir -p client/dbcLib server/dbcLib
-	# cp -r dbcLib/{dist,build,package.json,package-lock.json,node_modules} client/src/dbcLib/
-	# cp -r dbcLib/{dist,build,package.json,package-lock.json,node_modules} server/dbcLib/
+$(dbclib): $(shell find dbcLib/src -name "*.ts") dbcLib/package.json
+	cd dbcLib && npx tsc && npx webpack --mode production
 
-$(client): $(dbclib) $(wildcard client/ext-src/*.ts) $(wildcard client/public/*) $(wildcard client/scripts/*.js) $(wildcard client/src/*)
-	cd client && npm run build
-	# cp client/dist/* client/build/ext-src/
+$(client): $(dbclib) $(shell find client/src client/ext-src -name "*.ts" -o -name "*.tsx" -o -name "*.css") client/package.json
+	cd client && CI=true npm run build
 
-$(server): $(dbclib) $(wildcard server/src/*.ts) server/dbc.jison server/dbc.lex
+$(server): $(dbclib) $(shell find server/src -name "*.ts") server/dbc.jison server/dbc.lex server/package.json
 	cd server && npm run build
 
 
@@ -53,11 +49,9 @@ clean:
 	rm -f syntaxes/dbc.tmLanguage.json snippets/snippets.json
 	rm -rf client/build client/dist
 	rm -rf dbcLib/build dbcLib/dist
-	rm -rf server/dist server/out
+	rm -rf server/dist server/out server/src/parser.ts server/src/lexer.ts
 	rm -f *.vsix
-	# rm -rf {client,server}/dbcLib
 
 .PHONY: package
-package: $(dbclib) $(client) $(server) syntaxes
+package: all
 	npx vsce package
-
