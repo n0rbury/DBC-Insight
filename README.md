@@ -2,8 +2,8 @@
 
 ![DBC Insight Logo](res/image.png)
 
-[![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/n0rbury.dbc-insight)](https://marketplace.visualstudio.com/items?itemName=n0rbury.dbc-insight)
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/n0rbury/dbc-insight/integration.yml?branch=main)
+[![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/n0rbury.dbc-insight?style=flat-square)](https://marketplace.visualstudio.com/items?itemName=n0rbury.dbc-insight)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/n0rbury/dbc-insight/integration.yml?branch=master&style=flat-square)
 
 DBC Insight is a comprehensive VS Code extension for CAN Database (DBC) files. It combines a robust Language Server for real-time validation with a high-performance interactive preview panel for network visualization.
 
