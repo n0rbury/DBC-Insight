@@ -7,7 +7,7 @@
 		"url": "https://github.com/n0rbury/DBC-Insight"
 	},
 	"license": "GPL-2.0-only",
-	"version": "3.0.1",
+	"version": "3.0.2",
 	"publisher": "n0rbury",
 	"engines": {
 		"vscode": "^1.85.0"

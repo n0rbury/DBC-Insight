@@ -4,7 +4,7 @@ This is a VS Code extension for DBC (CAN Database) file language support, forked
 
 **Repository:** https://github.com/n0rbury/DBC-Insight  
 **Publisher:** n0rbury  
-**Current Version:** 3.0.1
+**Current Version:** 3.0.2
 
 ## Architecture
 

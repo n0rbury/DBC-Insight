@@ -2,12 +2,12 @@
 
 ![DBC Insight Logo](res/image.png)
 
-[![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/n0rbury.dbc-insight)](https://marketplace.visualstudio.com/items?itemName=n0rbury.dbc-insight)
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/n0rbury/dbc-insight/integration.yml?branch=main)
+[![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/n0rbury.dbc-insight?style=flat-square)](https://marketplace.visualstudio.com/items?itemName=n0rbury.dbc-insight)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/n0rbury/dbc-insight/integration.yml?branch=master&style=flat-square)
 
 DBC Insight is a comprehensive VS Code extension for CAN Database (DBC) files. It combines a robust Language Server for real-time validation with a high-performance interactive preview panel for network visualization.
 
-This project is a fork and major reboot of the original [DBC Language Syntax](https://github.com/lharri73/DBC-Language-Syntax) extension.
+This project is a fork and major reboot of the original [DBC Language Syntax](https://github.com/lharri73/DBC-Language-Syntax) extension. The project is mostly developed in my spare time with vibe coding, using OpenCode with Gemini 3.5 Flash. If you really like it, please give it a star on GitHub. Also feel free to report bugs or request new features. I will try to keep this project updated.
 
 ## 🌟 Key Features
 
@@ -45,6 +45,12 @@ This project is a fork and major reboot of the original [DBC Language Syntax](ht
 ### Code Snippets
 ![Snippets](res/snippets.gif)
 *Fast scaffolding of DBC objects.*
+
+---
+
+## 🛣️ Roadmap
+1. Add bus load estimation functionality to the preview panel.
+2. Make the preview editable and sync changes back to the dbc file?
 
 ---
 
