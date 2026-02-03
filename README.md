@@ -2,12 +2,12 @@
 
 ![DBC Insight Logo](res/image.png)
 
-[![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/n0rbury.dbc-insight?style=flat-square)](https://marketplace.visualstudio.com/items?itemName=n0rbury.dbc-insight)
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/n0rbury/dbc-insight/integration.yml?branch=main?style=flat-square)
+[![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/n0rbury.dbc-insight)](https://marketplace.visualstudio.com/items?itemName=n0rbury.dbc-insight)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/n0rbury/dbc-insight/integration.yml?branch=main)
 
 DBC Insight is a comprehensive VS Code extension for CAN Database (DBC) files. It combines a robust Language Server for real-time validation with a high-performance interactive preview panel for network visualization.
 
-This project is a fork and major reboot of the original [DBC Language Syntax](https://github.com/Math-A-Saurus/dbc-language-syntax) extension.
+This project is a fork and major reboot of the original [DBC Language Syntax](https://github.com/lharri73/DBC-Language-Syntax) extension.
 
 ## 🌟 Key Features
 
@@ -54,7 +54,7 @@ This project is a fork and major reboot of the original [DBC Language Syntax](ht
 - **`client`**: Extension host and the React-based visual exploration panel.
 
 ## 🤝 Credits & Acknowledgments
-DBC Insight is built upon the foundational work of **Landon Harris**, the original creator of the DBC Language Syntax extension. His implementation of the core parser and LSP structure made this reboot possible.
+DBC Insight is built upon the foundational work of [**Landon Harris**](https://github.com/lharri73), the original creator of the DBC Language Syntax extension. His implementation of the core parser and LSP structure made this reboot possible.
 
 ### Third Party Libraries
 - [jison](https://github.com/zaach/jison) - Parser generator.
