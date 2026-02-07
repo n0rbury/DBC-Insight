@@ -155,16 +155,16 @@ class App extends React.Component<Props, State> {
                                 )}
                             </div>
                             <div className="sortContainer">
-                                <span>Sort Messages:</span>
+                                <span>Sort Messages by:</span>
                                 <select 
                                     value={this.state.sortMode} 
                                     onChange={e => this.setState({ sortMode: e.target.value as SortMode })}
                                     className="sortSelect"
                                 >
-                                    <option value="id-asc">ID (Asc)</option>
-                                    <option value="id-desc">ID (Desc)</option>
-                                    <option value="name-asc">Name (Asc)</option>
-                                    <option value="name-desc">Name (Desc)</option>
+                                    <option value="id-asc">ID (Ascending)</option>
+                                    <option value="id-desc">ID (Descending)</option>
+                                    <option value="name-asc">Name (Ascending)</option>
+                                    <option value="name-desc">Name (Descending)</option>
                                     <option value="dbc">DBC Order</option>
                                 </select>
                             </div>
@@ -247,7 +247,7 @@ class App extends React.Component<Props, State> {
                             <div key={node.name}>
                                 <div 
                                     className={`TreeItem ${this.state.selectedItem?.type === 'node' && this.state.selectedItem.data === node ? 'selected' : ''}`}
-                                    onClick={() => this.selectItem('node', node)}
+                                    onClick={() => { this.selectItem('node', node); this.toggleGroup(`node-${node.name}`); }}
                                 >
                                     <span 
                                         className={`Chevron ${expandedGroups.has(`node-${node.name}`) ? 'expanded' : ''}`}
@@ -313,7 +313,7 @@ class App extends React.Component<Props, State> {
                                 <div key={msg.id}>
                                     <div 
                                         className={`TreeItem ${this.state.selectedItem?.type === 'message' && this.state.selectedItem.data === msg ? 'selected' : ''}`}
-                                        onClick={() => this.selectItem('message', msg)}
+                                        onClick={() => { this.selectItem('message', msg); this.toggleGroup(`msg-${msg.id}`); }}
                                     >
                                         <span 
                                             className={`Chevron ${expandedGroups.has(`msg-${msg.id}`) ? 'expanded' : ''}`}
