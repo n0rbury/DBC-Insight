@@ -1,13 +1,13 @@
 {
 	"name": "dbc-insight",
 	"displayName": "DBC Insight",
-	"description": "VS Code extension providing diagnostics and a powerful graphical preview for CAN DBC files.",
+	"description": "DBC language support for Visual Studio Code, including syntax highlighting, snippets, and interactive preview panel for code analysis.",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/n0rbury/DBC-Insight"
 	},
 	"license": "GPL-2.0-only",
-	"version": "3.0.2",
+	"version": "3.0.3",
 	"publisher": "n0rbury",
 	"engines": {
 		"vscode": "^1.85.0"
