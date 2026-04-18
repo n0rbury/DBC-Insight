@@ -40,7 +40,7 @@ export function activate(context: vscode.ExtensionContext){
         documentSelector: [{scheme: 'file', language: 'dbc'}],
         synchronize: {
             // Notify the server about file changes to '.dbc files contained in the vscode.workspace
-            fileEvents: vscode.workspace.createFileSystemWatcher('**/.dbc')
+            fileEvents: vscode.workspace.createFileSystemWatcher('**/*.dbc')
         }
     };
 
@@ -65,9 +65,17 @@ export function activate(context: vscode.ExtensionContext){
             if(!vscode.window.activeTextEditor) return;
             if(!panel.panel){
                 vscode.workspace.openTextDocument(vscode.window.activeTextEditor.document.uri).then(doc => {
-                    const viewPanel = vscode.window.createWebviewPanel("dbc", "DBC Preview", {preserveFocus: true, viewColumn: vscode.ViewColumn.Beside});
+                    const viewPanel = vscode.window.createWebviewPanel("dbc", "DBC Insight", {preserveFocus: true, viewColumn: vscode.ViewColumn.Beside});
                     panel.resolveCustomTextEditor(doc, viewPanel, <vscode.CancellationToken><unknown>null);
                 });              
+            }
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.window.onDidChangeActiveTextEditor(editor => {
+            if (editor && editor.document.languageId === 'dbc' && panel.panel) {
+                panel.update(editor.document);
             }
         })
     );

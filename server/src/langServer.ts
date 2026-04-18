@@ -94,17 +94,16 @@ export class DBCServer {
             this.connection.client.register(DidChangeConfigurationNotification.type, undefined);
         }
         
-        this.connection.onDidChangeTextDocument((change: DidChangeTextDocumentParams)=>{
-            if(this.working) return; // really this should stop the current parse job but that's difficult so...this works. 
+        this.documents.onDidChangeContent((change) => {
+            if (this.working) return;
             this.working = true;
-            this.getDocumentSettings(change.textDocument.uri).then((settings) =>{
+            this.getDocumentSettings(change.document.uri).then((settings) => {
                 this.parser.addConfig(settings);
-                
-                this.parser.parse(change.contentChanges[0].text, change.textDocument.uri);
+                this.parser.parse(change.document.getText(), change.document.uri);
                 this.working = false;
             });
         });
-        
+
         this.documents.onDidClose((event: TextDocumentChangeEvent<TextDocument>) => {
             this.documentSettings.delete(event.document.uri);
         });

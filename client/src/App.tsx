@@ -650,10 +650,43 @@ class App extends React.Component<Props, State> {
                 } else {
                     let db = decodeDb(ev.data);
                     console.log("decoded here", db);
+                    
+                    // Try to preserve selection
+                    let newSelectedItem: SelectedItem = null;
+                    if (this.state.selectedItem) {
+                        const oldItem = this.state.selectedItem;
+                        if (oldItem.type === 'node') {
+                            const newNode = db.nodes.get(oldItem.data.name);
+                            if (newNode) newSelectedItem = { type: 'node', data: newNode };
+                        } else if (oldItem.type === 'message') {
+                            const newMsg = db.messages.get(oldItem.data.id);
+                            if (newMsg) newSelectedItem = { type: 'message', data: newMsg };
+                        } else if (oldItem.type === 'signal') {
+                            // Signals need their parent message to be found first
+                            // We can't easily know the parent message ID from the Signal object alone 
+                            // in the current state without extra info, but we can search for it.
+                            // However, most signals are selected from a message view anyway.
+                            
+                            // Let's try to find the signal in the new DB. 
+                            // This is expensive but ensures selection preservation.
+                            for (const msg of db.messages.values()) {
+                                const newSig = msg.signals.get(oldItem.data.name);
+                                if (newSig) {
+                                    // Verify it's likely the same signal by checking if it's in a message with same ID
+                                    // since signal names are only unique within a message.
+                                    // We'd need the parent message ID in the SelectedItem state to be perfect.
+                                    newSelectedItem = { type: 'signal', data: newSig };
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
                     this.setState({
                         db: db,
                         loading: false,
                         errorState: 0,
+                        selectedItem: newSelectedItem
                     });
                 }
             }

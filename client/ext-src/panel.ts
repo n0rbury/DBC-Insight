@@ -17,7 +17,7 @@
 */
 
 import { readFileSync } from "fs";
-import { join } from "path";
+import { join, basename } from "path";
 import * as vscode from 'vscode'
 import { LanguageClient } from "vscode-languageclient/node";
 import { 
@@ -30,6 +30,8 @@ class DBCPanel implements vscode.CustomTextEditorProvider {
     public panel: vscode.WebviewPanel | null;
     private _extensionPath: string;
     public client: LanguageClient | null;
+    private _currentDocument: vscode.TextDocument | null;
+    private _notificationListener: vscode.Disposable | null;
 
     public static register(context: vscode.ExtensionContext, client: LanguageClient): {a: vscode.Disposable, b: DBCPanel}{
 		const provider = new DBCPanel(context);
@@ -42,6 +44,8 @@ class DBCPanel implements vscode.CustomTextEditorProvider {
         this._extensionPath = context.asAbsolutePath(join('client', 'build'));
         this.panel = null;
         this.client = null;
+        this._currentDocument = null;
+        this._notificationListener = null;
     }
 
     // public getPanel(){
@@ -103,22 +107,44 @@ class DBCPanel implements vscode.CustomTextEditorProvider {
         this.panel = webviewPanel;
         webviewPanel.webview.html = this._getHtmlForWebview(webviewPanel.webview);
 
-        this.registerCallbacks(document, webviewPanel);      
+        this._currentDocument = document;
+        this.panel.title = `DBC Insight: ${basename(document.uri.fsPath)}`;
+
+        this.registerCallbacks(webviewPanel);      
     }
 
-    private registerCallbacks(document: vscode.TextDocument, webviewPanel: vscode.WebviewPanel){
+    public update(document: vscode.TextDocument) {
+        if (!this.panel) return;
+        this._currentDocument = document;
+        this.panel.title = `DBC Insight: ${basename(document.uri.fsPath)}`;
+        this.client?.sendNotification("dbc/parseRequest", document.uri.toString());
+    }
+
+    private registerCallbacks(webviewPanel: vscode.WebviewPanel){
         // document change event
-        this.client?.onNotification("dbc/fileParsed", (result: string) => {
-            webviewPanel.webview.postMessage(result);
-        });
+        this._notificationListener = this.client?.onNotification("dbc/fileParsed", (result: { uri: string, database: string }) => {
+            if (this._currentDocument && result.uri === this._currentDocument.uri.toString()) {
+                webviewPanel.webview.postMessage(result.database);
+            }
+        }) || null;
+        
         this.client?.onNotification("dbc/closeFile", (uri: vscode.Uri) => {
-            if(uri == document.uri){
+            if(this._currentDocument && uri == this._currentDocument.uri){
                 webviewPanel.dispose();
             }
         })
-        this.client?.sendNotification("dbc/parseRequest", document.uri.toString());
-        this.panel?.onDidDispose(() => {
-            this.panel = null;
+
+        if (this._currentDocument) {
+            this.client?.sendNotification("dbc/parseRequest", this._currentDocument.uri.toString());
+        }
+        
+        webviewPanel.onDidDispose(() => {
+            if (this.panel === webviewPanel) {
+                this.panel = null;
+            }
+            this._notificationListener?.dispose();
+            this._notificationListener = null;
+            this._currentDocument = null;
         });
     }
 }

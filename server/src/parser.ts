@@ -82,7 +82,7 @@ export class DBCParser {
         // if no error
         parseResult.fileName = uri; // we send the uri into the fileName field so we can decode it on the client side
         var toSend = encodeDb(parseResult);
-        this.connection.sendNotification("dbc/fileParsed", toSend);
+        this.connection.sendNotification("dbc/fileParsed", { uri: uri, database: toSend });
     }
 
     // send errors to vscode
