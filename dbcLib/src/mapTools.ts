@@ -68,17 +68,20 @@ extensionCodec.register({
             var name: Uint8Array = encode(object.name, {extensionCodec});
             var type: Uint8Array = encode(object.objType, {extensionCodec});
             var value: Uint8Array = encode(object.valType, {extensionCodec});
-            return encode([name, type, value], {extensionCodec});
+            var defaultValue: Uint8Array = encode(object.defaultValue, {extensionCodec});
+            return encode([name, type, value, defaultValue], {extensionCodec});
         }else
             return null;
     },
     decode: (data: Uint8Array) => {
         const array = decode(data, {extensionCodec}) as Array<Uint8Array>;
-        return new AttributeDef(
+        const ret = new AttributeDef(
             decode(array[0], {extensionCodec}) as string,
             decode(array[1], {extensionCodec}) as number,
             decode(array[2], {extensionCodec}) as ValueType
         );
+        ret.defaultValue = decode(array[3], {extensionCodec});
+        return ret;
     }
 });
 

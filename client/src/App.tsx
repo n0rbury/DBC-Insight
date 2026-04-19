@@ -390,6 +390,10 @@ class App extends React.Component<Props, State> {
     }
 
     renderMessageDetails(msg: Message) {
+        const sendType = this.formatAttributeValue(msg, 'GenMsgSendType');
+        const cycleTime = this.getAttributeValue(msg, 'GenMsgCycleTime');
+        const timeoutTime = this.getAttributeValue(msg, 'GenMsgTimeoutTime');
+
         return (
             <div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '40px' }}>
@@ -400,6 +404,12 @@ class App extends React.Component<Props, State> {
                         <div>{msg.size} bytes</div>
                         <div className="PropertyLabel">Transmitter</div>
                         <div>{msg.transmitter}</div>
+                        <div className="PropertyLabel">Send Type</div>
+                        <div>{sendType}</div>
+                        <div className="PropertyLabel">Cycle Time</div>
+                        <div>{cycleTime !== undefined ? `${cycleTime} ms` : 'N/A'}</div>
+                        <div className="PropertyLabel">Timeout</div>
+                        <div>{timeoutTime !== undefined ? `${timeoutTime} ms` : 'N/A'}</div>
                         <div className="PropertyLabel">Comment</div>
                         <div>{msg.comment || 'No comment'}</div>
                     </div>
@@ -442,6 +452,11 @@ class App extends React.Component<Props, State> {
 
     renderSignalDetails(sig: Signal) {
         let descriptions: [any, any][] = [];
+        const initialValueRaw = this.getAttributeValue(sig, 'GenSigStartValue');
+        let initialValuePhys: number | undefined;
+        if (initialValueRaw !== undefined && !isNaN(Number(initialValueRaw))) {
+            initialValuePhys = Number(initialValueRaw) * sig.factor + sig.offset;
+        }
         
         // The parser stores descriptions directly in sig.valTable (not sig.valTable.descriptions)
         // or sometimes in a ValTable object.
@@ -475,6 +490,19 @@ class App extends React.Component<Props, State> {
                     <div>{sig.byteOrder ? 'Little Endian (Intel)' : 'Big Endian (Motorola)'}</div>
                     <div className="PropertyLabel">Value Type</div>
                     <div>{sig.valueType ? 'Signed' : 'Unsigned'}</div>
+                    <div className="PropertyLabel">Initial Value</div>
+                    <div>
+                        {initialValueRaw !== undefined ? (
+                            <>
+                                {initialValueRaw}
+                                {initialValuePhys !== undefined && (
+                                    <span style={{ opacity: 0.8, marginLeft: '8px' }}>
+                                        (Physical: {initialValuePhys}{sig.unit ? ` ${sig.unit}` : ''})
+                                    </span>
+                                )}
+                            </>
+                        ) : 'N/A'}
+                    </div>
                     <div className="PropertyLabel">Factor</div>
                     <div>{sig.factor}</div>
                     <div className="PropertyLabel">Offset</div>
@@ -514,6 +542,46 @@ class App extends React.Component<Props, State> {
                 )}
             </div>
         );
+    }
+
+    getAttributeValue(obj: any, attrName: string): any {
+        if (!obj || !obj.attributes || typeof obj.attributes.get !== 'function') {
+            return undefined;
+        }
+        const attr = obj.attributes.get(attrName);
+        if (attr !== undefined) {
+            return attr.value;
+        }
+        if (!this.state.db || !this.state.db.attrDefs) {
+            return undefined;
+        }
+        const def = this.state.db.attrDefs.get(attrName);
+        if (def && def.defaultValue !== undefined) {
+            return def.defaultValue;
+        }
+        return undefined;
+    }
+
+    formatAttributeValue(obj: any, attrName: string): string {
+        try {
+            const val = this.getAttributeValue(obj, attrName);
+            if (val === undefined) return 'N/A';
+
+            if (!this.state.db || !this.state.db.attrDefs) {
+                return String(val);
+            }
+            const def = this.state.db.attrDefs.get(attrName);
+            if (def && def.valType && def.valType.type === 4) { // ENUM
+                const enumVals = def.valType.enumVals;
+                if (enumVals && enumVals[val] !== undefined) {
+                    return enumVals[val];
+                }
+            }
+            return String(val);
+        } catch (e) {
+            console.error(`Error formatting attribute ${attrName}:`, e);
+            return 'Error';
+        }
     }
 
     getSignalBits(sig: Signal): number[] {

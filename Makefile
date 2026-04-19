@@ -49,7 +49,7 @@ clean:
 	rm -f syntaxes/dbc.tmLanguage.json snippets/snippets.json
 	rm -rf client/build client/dist
 	rm -rf dbcLib/build dbcLib/dist
-	rm -rf server/dist server/out server/src/parser.ts server/src/lexer.ts
+	rm -rf server/dist server/out
 	rm -f *.vsix
 
 .PHONY: package

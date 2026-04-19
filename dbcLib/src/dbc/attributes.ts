@@ -36,10 +36,12 @@ export class AttributeDef{
         this.name = name;
         this.objType = objType;
         this.valType = valType;
+        this.defaultValue = undefined;
         this.clsType = "attributeDef";
     }
     public name: string;
     public objType: number;
     public valType: ValueType;
+    public defaultValue: any;
     public clsType: string;
 }

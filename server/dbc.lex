@@ -39,6 +39,8 @@ DEFINER         (?![a-zA-Z])
 "BS_"{DEFINER}                      {return "BS"}
 "BU_"{DEFINER}                      {return "BU"}
 "BU_SG_REL_"{DEFINER}               {return "BU_SG_REL"}
+"BU_EV_REL_"{DEFINER}               {return "BU_EV_REL"}
+"BU_BO_REL_"{DEFINER}               {return "BU_BO_REL"}
 "CM_"{DEFINER}                      {return "CM"}
 "DUMMY_NODE_VECTOR0"{DEFINER}       {return "DUMMY_NODE_VECTOR0"}
 "DUMMY_NODE_VECTOR1"{DEFINER}       {return "DUMMY_NODE_VECTOR1"}

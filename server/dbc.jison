@@ -46,12 +46,51 @@ const db = new dbclib.Database();
 %token COLON 
 %token VECTOR_XXX
 %token UNSAFE_WORD
-// %token REG_WORD
 %token DECIMAL
-// %token DBC_WORD
 %token ENDOFFILE
 %token MULTIPLEXOR
 %token MULTIPLEXED
+%token BA
+%token BA_DEF
+%token BA_DEF_DEF
+%token BA_DEF_DEF_REL
+%token BA_DEF_REL
+%token BA_REL
+%token BO_TX_BU
+%token BU_SG_REL
+%token CM
+%token ENVVAR_DATA
+%token EV
+%token FLOAT
+%token HEX
+%token INT
+%token SGTYPE
+%token SIG_GROUP
+%token STRING
+%token VAL
+%token QUOTED_STRING
+%token EOL
+%token COMMA
+%token SEMICOLON
+%token PLUS
+%token MINUS
+%token OPEN_PAREN
+%token CLOSE_PAREN
+%token OPEN_BRACK
+%token CLOSE_BRACK
+%token DECIMAL_EXP
+%token DECIMAL_POINT
+%token DUMMY_NODE_VECTOR0
+%token DUMMY_NODE_VECTOR1
+%token DUMMY_NODE_VECTOR2
+%token DUMMY_NODE_VECTOR3
+%token DUMMY_NODE_VECTOR8000
+%token DUMMY_NODE_VECTOR8001
+%token DUMMY_NODE_VECTOR8002
+%token DUMMY_NODE_VECTOR8003
+%token BU_EV_REL
+%token BU_BO_REL
+
 
 %%
 
@@ -117,6 +156,8 @@ symbols_list
     | BO_TX_BU
     | BU
     | BU_SG_REL
+    | BU_EV_REL
+    | BU_BO_REL
     | CM
     | ENVVAR_DATA
     | EV
@@ -511,10 +552,14 @@ attribute_defaults
 // TODO: attribute defaults
 attribute_default
     : BA_DEF_DEF QUOTED_STRING attribute_val SEMICOLON EOL {
-
+        if (db.attrDefs.has($2)) {
+            db.attrDefs.get($2).defaultValue = $3;
+        }
     }
     | BA_DEF_DEF_REL QUOTED_STRING attribute_val SEMICOLON EOL {
-
+        if (db.attrDefs.has($2)) {
+            db.attrDefs.get($2).defaultValue = $3;
+        }
     };
 
 attribute_val 
@@ -581,9 +626,9 @@ attribute_vals
         error.addMapCondition(db.nodes, $4);
         db.parseErrors.push(error);
 
-        var attribute = new dbclib.Attribute($2, 1, $4);
+        var attribute = new dbclib.Attribute($2, 1, $5);
 
-        if(db.nodes.has($4) && db.nodes.get($4).attributes.has($2))
+        if(db.nodes.has($4))
             db.nodes.get($4).attributes.set($2,attribute);
     }
     | BA QUOTED_STRING BO id attribute_val SEMICOLON EOL {
@@ -592,7 +637,7 @@ attribute_vals
         db.parseErrors.push(error);
 
         var attribute = new dbclib.Attribute($2, 2, $5);
-        if(db.messages.has($4) && db.messages.get($4).attributes.has($2))
+        if(db.messages.has($4))
             db.messages.get($4).attributes.set($2, attribute);
     }
     | BA QUOTED_STRING SG id UNSAFE_WORD attribute_val SEMICOLON EOL {

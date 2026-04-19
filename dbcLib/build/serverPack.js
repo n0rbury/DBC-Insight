@@ -452,14 +452,17 @@ exports.extensionCodec.register({
             var name = (0, msgpack_1.encode)(object.name, { extensionCodec: exports.extensionCodec });
             var type = (0, msgpack_1.encode)(object.objType, { extensionCodec: exports.extensionCodec });
             var value = (0, msgpack_1.encode)(object.valType, { extensionCodec: exports.extensionCodec });
-            return (0, msgpack_1.encode)([name, type, value], { extensionCodec: exports.extensionCodec });
+            var defaultValue = (0, msgpack_1.encode)(object.defaultValue, { extensionCodec: exports.extensionCodec });
+            return (0, msgpack_1.encode)([name, type, value, defaultValue], { extensionCodec: exports.extensionCodec });
         }
         else
             return null;
     },
     decode: (data) => {
         const array = (0, msgpack_1.decode)(data, { extensionCodec: exports.extensionCodec });
-        return new attributes_1.AttributeDef((0, msgpack_1.decode)(array[0], { extensionCodec: exports.extensionCodec }), (0, msgpack_1.decode)(array[1], { extensionCodec: exports.extensionCodec }), (0, msgpack_1.decode)(array[2], { extensionCodec: exports.extensionCodec }));
+        const ret = new attributes_1.AttributeDef((0, msgpack_1.decode)(array[0], { extensionCodec: exports.extensionCodec }), (0, msgpack_1.decode)(array[1], { extensionCodec: exports.extensionCodec }), (0, msgpack_1.decode)(array[2], { extensionCodec: exports.extensionCodec }));
+        ret.defaultValue = (0, msgpack_1.decode)(array[3], { extensionCodec: exports.extensionCodec });
+        return ret;
     }
 });
 // Node
@@ -880,6 +883,7 @@ class AttributeDef {
         this.name = name;
         this.objType = objType;
         this.valType = valType;
+        this.defaultValue = undefined;
         this.clsType = "attributeDef";
     }
 }
