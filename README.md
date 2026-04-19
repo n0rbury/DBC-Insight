@@ -51,6 +51,7 @@ This project is a fork and major reboot of the original [DBC Language Syntax](ht
 ## 🛣️ Roadmap
 1. Add bus load estimation functionality to the preview panel.
 2. Make the preview editable and sync changes back to the dbc file?
+3. Add "Jump to Source" functionality to navigate from the interactive view to the specific line in the DBC file.
 
 ---
 

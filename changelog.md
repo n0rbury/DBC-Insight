@@ -1,5 +1,23 @@
 # Changelog
 
+## 3.1.0 (2026-04-19)
+- **Auto-Refresh**: Preview now automatically updates when the DBC file is saved.
+- **Active Tracking**: The preview panel now tracks the currently active DBC editor.
+- **Selection Preservation**: Selection and scroll position are preserved across refreshes.
+- **Parser Improvements**: Added support for critical DBC attributes and resolved several parser bugs.
+
+## 3.0.3 (2026-03-15)
+- **Collapsible Navigation**: Implemented folding for nodes and messages in the tree view.
+- **UI Refinements**: Enhanced icon contrast for better visibility in the VS Code Marketplace.
+
+## 3.0.2 (2026-02-20)
+- **Asset Updates**: New extension icon and updated marketplace badges.
+- **Documentation**: Comprehensive README cleanup and link verification.
+
+## 3.0.1 (2026-02-05)
+- **Build Optimization**: Removed development metadata from the final VSIX package.
+- **Documentation**: Minor documentation and issue template updates.
+
 ## 3.0.0 (2026-01-30)
 - **DBC Insight Reboot**: Official fork of DBC-Language-Syntax.
 - **Modern UI**: Completely reworked the preview panel with a professional CANdb++ inspired layout.
